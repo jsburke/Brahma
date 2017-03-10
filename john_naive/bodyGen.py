@@ -20,7 +20,13 @@
 # 
 #	Output file is named galaxy_###.csv
 #		where ### is the total number of bodies in the csv
+#
+#		format of each row is as follows:
+#			mass, x position, y position, z position, x velocity, y velocity, z velocity,
 # 
+#	All masses produced are kg
+#	All positions are km offset from origin
+#	All velocities are km/s referenced to origin
 #
 # Author  : John S. Burke
 # Date	  : 3 March 2017
@@ -33,11 +39,13 @@ import os, sys, argparse, random
 # Generic space numbers
 #-------------------------------------------------------
 
-SOLAR_MASS			= 1.99e30 # in kg
+SOLAR_MASS			= 1.99e30 	# in kg
 EARTH_MASS			= 5.9722e24
 JUPITER_MASS		= 317.8 * EARTH_MASS
 COMET_SMALL_MASS	= 1e13
 CERES_MASS			= 8.958e20
+
+SOLAR_VELOCITY		= 2.22e15	# km/s
 
 #--------------------------------------------------------
 # Relative Body masses and velocities
