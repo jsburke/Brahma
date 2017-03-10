@@ -45,7 +45,8 @@ JUPITER_MASS		= 317.8 * EARTH_MASS
 COMET_SMALL_MASS	= 1e13
 CERES_MASS			= 8.958e20
 
-SOLAR_VELOCITY		= 2.22e15	# km/s
+EARTH_VELOCITY		= 30		# km/s
+								# around sun
 
 #--------------------------------------------------------
 # Relative Body masses and velocities
@@ -73,8 +74,23 @@ minor_mass_max	= CERES_MASS
 
 
 
-bhole_velocity_min = 0					# setting to initially fixed
-bhole_velocity_max = 0
+bhole_velocity_min	= 0					# setting to initially fixed
+bhole_velocity_max	= 0
+
+star_velocity_min	= 0.00001 * EARTH_VELOCITY
+star_velocity_max	= 2.15 * EARTH_VELOCITY
+
+planet_velocity_min	= 0.15 * EARTH_VELOCITY
+planet_velocity_max = 5 * EARTH_VELOCITY
+
+giant_velocity_min	= 0.088 * EARTH_VELOCITY
+giant_velocity_max	= 0.5 * EARTH_VELOCITY
+
+moon_velocity_min	= 0.1 * EARTH_VELOCITY
+moon_velocity_max	= EARTH_VELOCITY
+
+minor_velocity_min	= 0.002 * EARTH_VELOCITY
+minor_velocity_max	= 21 * EARTH_VELOCITY
 #--------------------------------------------------------
 # Command Line
 #--------------------------------------------------------
