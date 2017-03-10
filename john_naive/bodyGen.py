@@ -33,11 +33,11 @@ import os, sys, argparse, random
 # Generic space numbers
 #-------------------------------------------------------
 
-SOLAR_MASS = 1.99e30 # in kg
-EARTH_MASS = 5.9722e24
-JUPITER_MASS = 317.8 * EARTH_MASS
-COMET_SMALL_MASS = 1e13
-CERES_MASS = 8.958e20
+SOLAR_MASS			= 1.99e30 # in kg
+EARTH_MASS			= 5.9722e24
+JUPITER_MASS		= 317.8 * EARTH_MASS
+COMET_SMALL_MASS	= 1e13
+CERES_MASS			= 8.958e20
 
 #--------------------------------------------------------
 # Relative Body masses and velocities
@@ -45,25 +45,28 @@ CERES_MASS = 8.958e20
 # Included to make sure we don't have something too wacky
 #--------------------------------------------------------
 
-bhole_mass_min = 5 * SOLAR_MASS
-bhole_mass_max = 200 * SOLAR_MASS
+bhole_mass_min	= 5 * SOLAR_MASS
+bhole_mass_max	= 200 * SOLAR_MASS
 
-star_mass_min = 0.08 * SOLAR_MASS
-star_mass_max = 12 * SOLAR_MASS
+star_mass_min	= 0.08 * SOLAR_MASS
+star_mass_max	= 12 * SOLAR_MASS
 
-planet_mass_min = .025 * EARTH_MASS # little less than 1/2 Mercury
-planet_mass_max = 17 * EARTH_MASS	# Kepler-10c
+planet_mass_min	= .025 * EARTH_MASS 	# little less than 1/2 Mercury
+planet_mass_max	= 17 * EARTH_MASS		# Kepler-10c
 
-giant_mass_min = 0.22 * JUPITER_MASS	# Bit smaller than Saturn 
-giant_mass_max = 12 * JUPITER_MASS	# just below low mass dwarf 13
+giant_mass_min	= 0.22 * JUPITER_MASS	# Bit smaller than Saturn 
+giant_mass_max	= 12 * JUPITER_MASS		# just below low mass dwarf 13
 
-moon_mass_min = 0.008 * EARTH_MASS	# Europa
-moon_mass_max = 0.026 * EARTH_MASS  # a midge bigger than Ganymede
+moon_mass_min	= 0.008 * EARTH_MASS	# Europa
+moon_mass_max	= 0.026 * EARTH_MASS  	# a midge bigger than Ganymede
 
-minor_mass_min = COMET_SMALL_MASS
-minor_mass_max = CERES_MASS
+minor_mass_min	= COMET_SMALL_MASS
+minor_mass_max	= CERES_MASS
 
 
+
+bhole_velocity_min = 0					# setting to initially fixed
+bhole_velocity_max = 0
 #--------------------------------------------------------
 # Command Line
 #--------------------------------------------------------
@@ -166,12 +169,12 @@ def main():
 		print(" ")
 	else: 
 		remainder = total - bodySum
-		print("Number of bodies unspecified: %d\n" % remainder)
+		if(verbose_on): print("Number of bodies unspecified: %d\n" % remainder)
 
 	# produce ouput file
 
 	filename = "galaxy_" + str(total) + ".csv"
-	if(verbose_on): print("Output file: %r" % filename)
+	if(verbose_on): print("Output file: %r\n" % filename)
 
 	outfile = open(filename, 'w')
 	outfile.truncate()
