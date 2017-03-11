@@ -121,7 +121,7 @@ def body_create(category, mass_min, mass_max, vel_min, vel_max):
 # Command Line
 #--------------------------------------------------------
 
-class ParseWithError(argparse.ArgumentParser):
+class parse_defined_error(argparse.ArgumentParser):
 	def error(self, msg = ""):
 		if(msg): print("\nERROR: %s\n" % msg)
 		file = open(sys.argv[0])
@@ -130,7 +130,7 @@ class ParseWithError(argparse.ArgumentParser):
 			if((lineNum == 2) or (lineNum >= 4)): print(line[1:].rstrip("\n"))
 
 def parse_cmd():
-	parser = ParseWithError(add_help = False)
+	parser = parse_defined_error(add_help = False)
 
 	# Normal Args
 
