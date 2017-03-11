@@ -22,7 +22,7 @@
 #		where ### is the total number of bodies in the csv
 #
 #		format of each row is as follows:
-#			mass, x position, y position, z position, x velocity, y velocity, z velocity,
+#			category, mass, x position, y position, z position, x velocity, y velocity, z velocity,
 # 
 #	All masses produced are kg
 #	All positions are km offset from origin
@@ -30,10 +30,10 @@
 #
 # Author  : John S. Burke
 # Date	  : 3 March 2017
-# Rev.    : 0.1
+# Rev.    : 1.0
 #
 
-import os, sys, argparse, random
+import os, sys, argparse, random, math
 
 #-------------------------------------------------------
 # Generic space numbers
@@ -48,49 +48,75 @@ CERES_MASS			= 8.958e20
 EARTH_VELOCITY		= 30		# km/s
 								# around sun
 
+MAX_POS_DOUBLE		= 1.7e308
+MAX_NEG_DOUBLE		= -1.7e308
+LOW_TOL				= 0.15		# tolerances so we don't start at screen edges
+HIGH_TOL			= 0.85
+
 #--------------------------------------------------------
 # Relative Body masses and velocities
 #
 # Included to make sure we don't have something too wacky
 #--------------------------------------------------------
 
-bhole_mass_min	= 5 * SOLAR_MASS
-bhole_mass_max	= 200 * SOLAR_MASS
+BHOLE_MASS_MIN	= 5 * SOLAR_MASS
+BHOLE_MASS_MAX	= 200 * SOLAR_MASS
 
-star_mass_min	= 0.08 * SOLAR_MASS
-star_mass_max	= 12 * SOLAR_MASS
+STAR_MASS_MIN	= 0.08 * SOLAR_MASS
+STAR_MASS_MAX	= 12 * SOLAR_MASS
 
-planet_mass_min	= .025 * EARTH_MASS 	# little less than 1/2 Mercury
-planet_mass_max	= 17 * EARTH_MASS		# Kepler-10c
+PLANET_MASS_MIN	= .025 * EARTH_MASS 	# little less than 1/2 Mercury
+PLANET_MASS_MAX	= 17 * EARTH_MASS		# Kepler-10c
 
-giant_mass_min	= 0.22 * JUPITER_MASS	# Bit smaller than Saturn 
-giant_mass_max	= 12 * JUPITER_MASS		# just below low mass dwarf 13
+GIANT_MASS_MIN	= 0.22 * JUPITER_MASS	# Bit smaller than Saturn 
+GIANT_MASS_MAX	= 12 * JUPITER_MASS		# just below low mass dwarf 13
 
-moon_mass_min	= 0.008 * EARTH_MASS	# Europa
-moon_mass_max	= 0.026 * EARTH_MASS  	# a midge bigger than Ganymede
+MOON_MASS_MIN	= 0.008 * EARTH_MASS	# Europa
+MOON_MASS_MAX	= 0.026 * EARTH_MASS  	# a midge bigger than Ganymede
 
-minor_mass_min	= COMET_SMALL_MASS
-minor_mass_max	= CERES_MASS
+MINOR_MASS_MIN	= COMET_SMALL_MASS
+MINOR_MASS_MAX	= CERES_MASS
 
 
 
-bhole_velocity_min	= 0					# setting to initially fixed
-bhole_velocity_max	= 0
+BHOLE_VELOCITY_MIN	= 0					# setting to initially fixed
+BHOLE_VELOCITY_MAX	= 0
 
-star_velocity_min	= 0.00001 * EARTH_VELOCITY
-star_velocity_max	= 2.15 * EARTH_VELOCITY
+STAR_VELOCITY_MIN	= 0.00001 * EARTH_VELOCITY
+STAR_VELOCITY_MAX	= 2.15 * EARTH_VELOCITY
 
-planet_velocity_min	= 0.15 * EARTH_VELOCITY
-planet_velocity_max = 5 * EARTH_VELOCITY
+PLANET_VELOCITY_MIN	= 0.15 * EARTH_VELOCITY
+PLANET_VELOCITY_MAX = 5 * EARTH_VELOCITY
 
-giant_velocity_min	= 0.088 * EARTH_VELOCITY
-giant_velocity_max	= 0.5 * EARTH_VELOCITY
+GIANT_VELOCITY_MIN	= 0.088 * EARTH_VELOCITY
+GIANT_VELOCITY_MAX	= 0.5 * EARTH_VELOCITY
 
-moon_velocity_min	= 0.1 * EARTH_VELOCITY
-moon_velocity_max	= EARTH_VELOCITY
+MOON_VELOCITY_MIN	= 0.1 * EARTH_VELOCITY
+MOON_VELOCITY_MAX	= EARTH_VELOCITY
 
-minor_velocity_min	= 0.002 * EARTH_VELOCITY
-minor_velocity_max	= 21 * EARTH_VELOCITY
+MINOR_VELOCITY_MIN	= 0.002 * EARTH_VELOCITY
+MINOR_VELOCITY_MAX	= 21 * EARTH_VELOCITY
+
+#--------------------------------------------------------
+# Random body generation
+#--------------------------------------------------------
+
+def pos_rand():
+	return random.uniform(LOW_TOL * MAX_POS_DOUBLE, HIGH_TOL * MAX_POS_DOUBLE) 
+
+def vel_scale(v):
+	return math.sqrt(v)
+
+def body_create(category, mass_min, mass_max, vel_min, vel_max):
+	mass  = str(random.uniform(mass_min, mass_max))
+	x_pos = str(pos_rand())
+	y_pos = str(pos_rand())
+	z_pos = str(pos_rand())
+	x_vel = str(random.uniform(vel_min, vel_max))
+	y_vel = str(random.uniform(vel_min, vel_max))
+	z_vel = str(random.uniform(vel_min, vel_max))
+	return category + ", " + mass + ", " + x_pos + ", " + y_pos + ", " + z_pos + ", " + x_vel + ", " + y_vel + ", " + z_vel
+
 #--------------------------------------------------------
 # Command Line
 #--------------------------------------------------------
@@ -206,7 +232,22 @@ def main():
 	# generate the bodies and write to file
 
 	for i in xrange(0, bhole):
-		print(i)
+		outfile.write(body_create("bhole", BHOLE_MASS_MIN, BHOLE_MASS_MAX, BHOLE_VELOCITY_MIN, BHOLE_VELOCITY_MAX) + "\n")
+
+	for i in xrange(0, star):
+		outfile.write(body_create("star", STAR_MASS_MIN, STAR_MASS_MAX, STAR_VELOCITY_MIN, STAR_VELOCITY_MAX) + "\n")
+
+	for i in xrange(0, planet):
+		outfile.write(body_create("planet", PLANET_MASS_MIN, PLANET_MASS_MAX, PLANET_VELOCITY_MIN, PLANET_VELOCITY_MAX) + "\n")
+
+	for i in xrange(0, giant):
+		outfile.write(body_create("giant", GIANT_MASS_MIN, GIANT_MASS_MAX, GIANT_VELOCITY_MIN, GIANT_VELOCITY_MAX) + "\n")
+
+	for i in xrange(0, moon):
+		outfile.write(body_create("moon", MOON_MASS_MIN, MOON_MASS_MAX, MOON_VELOCITY_MIN, MOON_VELOCITY_MAX) + "\n")
+
+	for i in xrange(0, minor):
+		outfile.write(body_create("minor", MINOR_MASS_MIN, MINOR_MASS_MAX, MINOR_VELOCITY_MIN, MINOR_VELOCITY_MAX) + "\n")
 
 	outfile.close()
 	if(verbose_on): print("Complete Success!  Shoot for the stars!")
