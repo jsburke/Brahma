@@ -1,4 +1,4 @@
-# Jupiter Project
+# Project Brahma
 
 A simulation of N-Body Gravitation with graphical display targetting high performance computation and GPU programming
 
