@@ -248,25 +248,6 @@ def main():
 
 	# generate the bodies and write to file
 
-<<<<<<< HEAD
-	for i in range(0, bhole):
-		outfile.write(body_create("bhole", BHOLE_MASS_MIN, BHOLE_MASS_MAX, BHOLE_VELOCITY_MIN, BHOLE_VELOCITY_MAX) + "\n")
-
-	for i in range(0, star):
-		outfile.write(body_create("star", STAR_MASS_MIN, STAR_MASS_MAX, STAR_VELOCITY_MIN, STAR_VELOCITY_MAX) + "\n")
-
-	for i in range(0, planet):
-		outfile.write(body_create("planet", PLANET_MASS_MIN, PLANET_MASS_MAX, PLANET_VELOCITY_MIN, PLANET_VELOCITY_MAX) + "\n")
-
-	for i in range(0, giant):
-		outfile.write(body_create("giant", GIANT_MASS_MIN, GIANT_MASS_MAX, GIANT_VELOCITY_MIN, GIANT_VELOCITY_MAX) + "\n")
-
-	for i in range(0, moon):
-		outfile.write(body_create("moon", MOON_MASS_MIN, MOON_MASS_MAX, MOON_VELOCITY_MIN, MOON_VELOCITY_MAX) + "\n")
-
-	for i in range(0, minor):
-		outfile.write(body_create("minor", MINOR_MASS_MIN, MINOR_MASS_MAX, MINOR_VELOCITY_MIN, MINOR_VELOCITY_MAX) + "\n")
-=======
 	for i in xrange(0, bhole):
 		bhole_create(outfile)
 
@@ -294,7 +275,6 @@ def main():
 		elif sel == 3 : giant_create(outfile)
 		elif sel == 4 : moon_create(outfile)
 		elif sel == 5 : minor_create(outfile)
->>>>>>> origin/master
 
 	outfile.close()
 	if(verbose_on): print("Complete Success!  Shoot for the stars!")
