@@ -32,7 +32,7 @@ int main(int argc, char **argv)
     {
     	total_n += n;
         //printf("%d\n", total_n);
-    	printf("%d\n", j);
+    	//printf("%d\n", j);
     }
     
     
