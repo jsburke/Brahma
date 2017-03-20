@@ -74,12 +74,12 @@ int force_calc(FILE *s){
         tmp = strtok(NULL, ",");
         nbodies[i].zVelocity = atof(tmp);
 
-        printf("index i= %i, %f\n, %f\n, %f\n, %f\n, %f\n, %f\n, %f \n",i, nbodies[i].mass , nbodies[i].xPosition, nbodies[i].yPosition , nbodies[i].zPosition, nbodies[i].xVelocity, nbodies[i].yVelocity, nbodies[i].zVelocity);
+        //printf("index i= %i, %f\n, %f\n, %f\n, %f\n, %f\n, %f\n, %f \n",i, nbodies[i].mass , nbodies[i].xPosition, nbodies[i].yPosition , nbodies[i].zPosition, nbodies[i].xVelocity, nbodies[i].yVelocity, nbodies[i].zVelocity);
 
         i++;
     }
+    printf("%f\n",nbodies[1].mass);
 
-    
     free(buf);
     fclose(s);
     return 1;
@@ -101,16 +101,9 @@ int main(int argc, char **argv){
     }
     FILE *filename;
     filename = fopen(argv[1],"r");
-
-    //char a = argv[1];
-    //filename = &a;
     force_calc(filename);
-    //FILE a = argv[1]; //storing the filename 
-    //filename = &a;
-    //printf("%s",a);
-    //printf("\n");
-   // force_calc(filename);
-
     fclose(filename);
+
+
     return 0;
 }
