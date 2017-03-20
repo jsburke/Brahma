@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #-------------------------------------------------------
-# bodyGen [-h] [-v|-q] [options]
+
 #-------------------------------------------------------
 #
 #	-h --help		Display this message
@@ -248,25 +248,25 @@ def main():
 
 	# generate the bodies and write to file
 
-	for i in xrange(0, bhole):
+	for i in range(0, bhole):
 		bhole_create(outfile)
 
-	for i in xrange(0, star):
+	for i in range(0, star):
 		star_create(outfile)		
 
-	for i in xrange(0, planet):
+	for i in range(0, planet):
 		planet_create(outfile)
 
-	for i in xrange(0, giant):
+	for i in range(0, giant):
 		giant_create(outfile)
 
-	for i in xrange(0, moon):
+	for i in range(0, moon):
 		moon_create(outfile)
 
-	for i in xrange(0, minor):
+	for i in range(0, minor):
 		minor_create(outfile)
 
-	for i in xrange(0, remainder):
+	for i in range(0, remainder):
 		sel = random.randint(0,5)
 
 		if   sel == 0 : bhole_create(outfile)
