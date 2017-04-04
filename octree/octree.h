@@ -33,7 +33,7 @@ typedef struct octant
 	data_t 	mass_avg;
 
 	// children
-	octant 	children[8];  //  NULL if level above planets
+	octant 	*children[8];  //  NULL if level above planets
 
 	// leaf arrays
 	// malloc to create array
@@ -51,7 +51,7 @@ typedef struct octant
 
 } octant, *p_octant;  //  octant is a cube divided into 8 cubes inside it of equal size
 
-p_octant 	octant_new(int type, int oct_no);
+p_octant 	octant_new(octant_type type, int oct_no);
 
 void 		octant_center_of_mass(p_octant oct);
 void		octant_add_child(p_octant oct, p_octant child);
