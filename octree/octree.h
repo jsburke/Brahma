@@ -25,12 +25,13 @@ void		nbody_enum(nbody **body_array, char* file);
 typedef struct octant
 {
 	int 	octant_no;  // -1 if it is root node
+	int 	level;
 
 	// center of mass for the octant
 	data_t 	mass_center_x;
 	data_t 	mass_center_y;
 	data_t 	mass_center_z;
-	data_t 	mass_avg;
+	data_t 	mass_total;
 
 	// children
 	octant 	*children[8];  //  NULL if level above planets
@@ -57,6 +58,7 @@ void 		octant_center_of_mass(p_octant oct);
 void		octant_add_child(p_octant oct, p_octant child);
 
 void 		octant_add_body(p_octant oct, nbody* body);
-void 		octant_del_body(p_octant oct, nbody* body);
+
+void		octant_move_leaf(p_octant src, p_octant dst, int offset);
 
 #endif
