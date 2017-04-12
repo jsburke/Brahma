@@ -172,7 +172,7 @@ int octant_add_body(p_octant oct, nbody *body)  //returns true-false that may te
 		index = oct->leaf_count;
 		if(index > AREA_CAPACITY)
 		{
-			printf("\n\tERROR: Suboctant body capacity exceeded!\n");
+			printf("\n\tERROR: Suboctant body capacity exceeded in octant_add_body()!\n");
 			printf("\tPLEASE rebuild with wider arrays in octant struct!\n");
 			return KILL;
 		}
@@ -200,37 +200,52 @@ int octant_add_body(p_octant oct, nbody *body)  //returns true-false that may te
 	}
 }
 
-void octant_move_leaf(p_octant src, p_octant dst, int offset)
+int octant_move_leaf(p_octant src, p_octant dst, int src_index)
 {
-	int dst_index = -1;
-	int i;// = 
-	int dst_leaf_count = dst->leaf_count;
+	int dst_index = dst->leaf_count;
 
-	// find earliest place to fill in dst	
-	for(i = 0; i < dst_leaf_count; i++)
-	{
-		if(dst->mass[i] == MASS_INVALID) 
+	// check dst octant
+	if(dst->level == LVL_2)
+	{	
+		if(dst_index == AREA_CAPACITY)  // boundary check
 		{
-			dst_index = i;
-			break;
-		}	
+			printf("\n\tERROR: Suboctant body capacity exceeded in octant_move_leaf()!\n");
+			printf("\tPLEASE rebuild with wider arrays in octant struct!\n");
+			return KILL;
+		}
+		else
+		{
+
+			//first -- copy leaf from source to destination
+			dst->mass[dst_index]  = src->mass[src_index];
+
+			dst->pos_x[dst_index] = src->pos_x[src_index];
+			dst->pos_y[dst_index] = src->pos_y[src_index];
+			dst->pos_z[dst_index] = src->pos_z[src_index];
+
+			dst->vel_x[dst_index] = src->vel_x[src_index];
+			dst->vel_y[dst_index] = src->vel_y[src_index];
+			dst->vel_z[dst_index] = src->vel_z[src_index];
+
+			dst->leaf_count = dst_index + 1;  // note body addition
+
+			//remove leaf from source and compress arrays
+			int src_end = src->leaf_count;
+
+			src->mass[src_index]  = src->mass[src_end];
+
+			src->pos_x[src_index] = src->pos_x[src_end];
+			src->pos_y[src_index] = src->pos_y[src_end];
+			src->pos_z[src_index] = src->pos_z[src_end];
+
+			src->vel_x[src_index] = src->vel_x[src_end];
+			src->vel_y[src_index] = src->vel_y[src_end];
+			src->vel_z[src_index] = src->vel_z[src_end];
+
+			src->leaf_count = src_end - 1;
+			return PASS;	
+		}
 	}
-	dst_index = (dst_index == -1) ? i : dst_index;
-
-	// move from src to dst
-	dst->mass[dst_index] = src->mass[offset];
-
-	dst->pos_x[dst_index] = src->pos_x[offset];
-	dst->pos_y[dst_index] = src->pos_y[offset];
-	dst->pos_z[dst_index] = src->pos_z[offset];
-
-	dst->vel_x[dst_index] = src->vel_x[offset];
-	dst->vel_y[dst_index] = src->vel_y[offset];
-	dst->vel_z[dst_index] = src->vel_z[offset];
-
-	dst->leaf_count++;
-
-	//invalidate src
-	src->mass[offset] = MASS_INVALID;
-	src->leaf_count--;
+	else  // improper octant type passed
+	return SKIP;
 }
