@@ -59,6 +59,6 @@ void		octant_add_child(p_octant oct, p_octant child);
 
 int 		octant_add_body(p_octant oct, nbody* body);
 
-void		octant_move_leaf(p_octant src, p_octant dst, int offset);
+int 		octant_move_leaf(p_octant src, p_octant dst, int offset);
 
 #endif
