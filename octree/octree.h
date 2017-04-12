@@ -39,7 +39,7 @@ typedef struct octant
 	// leaf arrays
 	// malloc to create array
 	// NULL if no leafs
-	int 	leaf_count;
+	int 	leaf_count;  // index that will be written to, ie 2 means add 3rd body next or remove 2nd
 	data_t 	*mass;
 
 	data_t 	*pos_x;
