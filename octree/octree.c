@@ -3,8 +3,10 @@
 
 // code for body reading and generation
 
-#define LINE_LEN 	 256
-#define MASS_INVALID -1
+#define LINE_LEN 	  256
+#define MASS_INVALID  -1
+#define AREA_CAPACITY 10000  // trying to overallocate
+#define CHILD_COUNT   8
 
 int nbody_enum(nbody *body_array[], char* file)  //  True - False response
 {
@@ -55,7 +57,7 @@ int nbody_enum(nbody *body_array[], char* file)  //  True - False response
 
 //  code for octants
 
-p_octant octant_new(octant_type type, int oct_no)
+p_octant octant_new(int oct_no, octype level)
 {
 	p_octant oct = (p_octant) malloc(sizeof(octant));
 	
@@ -65,11 +67,45 @@ p_octant octant_new(octant_type type, int oct_no)
 		return NULL;
 	}
 
-	if(type == ROOT)
+	//generic for all octant types
+	oct->octant_no  = oct_no;
+	oct->leaf_count = 0;
+	oct->level      = level;
+
+	oct->mass_center_x = 0;
+	oct->mass_center_y = 0;
+	oct->mass_center_z = 0;
+	oct->mass_total    = 0;
+
+	if(level == LVL_2)
 	{
-		oct->octant_no = -1;
+		oct->mass  = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
+
+		oct->pos_x = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
+		oct->pos_y = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
+		oct->pos_z = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
+
+		oct->vel_x = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
+		oct->vel_y = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
+		oct->vel_z = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
+
+		oct->children  = NULL;  // has leaves not child octants
+	}else  // ROOT or LVL_1
+	{
+		if(level == ROOT) oct->octant_no = -1; //redundant for safety
+
+		oct->mass  = (data_t*) NULL;
+
+		oct->pos_x = (data_t*) NULL;
+		oct->pos_y = (data_t*) NULL;
+		oct->pos_z = (data_t*) NULL;
+
+		oct->vel_x = (data_t*) NULL;
+		oct->vel_y = (data_t*) NULL;
+		oct->vel_z = (data_t*) NULL;
+
+		oct->children = (p_octant) malloc(CHILD_COUNT * sizeof(octant));
 	}
-	else oct->octant_no = octant_no;
 
 	return oct;
 }
@@ -84,7 +120,7 @@ void octant_center_of_mass(p_octant oct)  // maybe center of gravity
 		data_t y_acc = 0;
 		data_t z_acc = 0;
 
-		if(oct->mass != NULL)  //  for nodes with leafs
+		if(oct->level == LVL_2)  //  for nodes with leafs
 		{
 			int leaf_count;
 			leaf_count = oct->leaf_count;
@@ -118,7 +154,7 @@ void octant_center_of_mass(p_octant oct)  // maybe center of gravity
 
 void octant_add_child(p_octant oct, p_octant child)
 {
-	oct->children[child->octant_no] = child;
+	oct->children[child->octant_no] = child;  // will need to create suboctants carefully
 }
 
 void octant_add_body(p_octant oct, nbody *body)
