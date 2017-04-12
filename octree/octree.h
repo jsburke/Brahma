@@ -3,7 +3,7 @@
 
 typedef data_t   float;
 
-typedef enum octant_type {ROOT, LVL_1, LVL_2} octant_type;  //  LVL_2 has no octant children, but uses body arrays
+typedef enum octype {ROOT, LVL_1, LVL_2} octant_type;  //  LVL_2 has no octant children, but uses body arrays
 
 //  body struct for reading from file
 
@@ -25,7 +25,7 @@ void		nbody_enum(nbody **body_array, char* file);
 typedef struct octant
 {
 	int 	octant_no;  // -1 if it is root node
-	int 	level;
+	octype 	level;
 
 	// center of mass for the octant
 	data_t 	mass_center_x;
@@ -52,7 +52,7 @@ typedef struct octant
 
 } octant, *p_octant;  //  octant is a cube divided into 8 cubes inside it of equal size
 
-p_octant 	octant_new(octant_type type, int oct_no);
+p_octant 	octant_new(int oct_no, octype level);
 
 void 		octant_center_of_mass(p_octant oct);
 void		octant_add_child(p_octant oct, p_octant child);
