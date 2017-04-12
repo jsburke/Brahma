@@ -57,7 +57,7 @@ p_octant 	octant_new(int oct_no, octype level);
 void 		octant_center_of_mass(p_octant oct);
 void		octant_add_child(p_octant oct, p_octant child);
 
-void 		octant_add_body(p_octant oct, nbody* body);
+int 		octant_add_body(p_octant oct, nbody* body);
 
 void		octant_move_leaf(p_octant src, p_octant dst, int offset);
 
