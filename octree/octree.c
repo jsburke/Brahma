@@ -8,6 +8,14 @@
 #define AREA_CAPACITY 10000  // trying to overallocate
 #define CHILD_COUNT   8
 
+// following are int returns in fashion of t-f
+// skip means the func was called wrongly, but
+// that the evaluation was skipped and may not
+// harm execution
+#define KILL 		  0
+#define PASS 		  1
+#define SKIP 		  2
+
 int nbody_enum(nbody *body_array[], char* file)  //  True - False response
 {
 	FILE *fp;
@@ -157,22 +165,38 @@ void octant_add_child(p_octant oct, p_octant child)
 	oct->children[child->octant_no] = child;  // will need to create suboctants carefully
 }
 
-void octant_add_body(p_octant oct, nbody *body)
+int octant_add_body(p_octant oct, nbody *body)  //returns true-false that may terminate execution
 {
-	if(oct->octant_no > -1)  // am I not the root
+	if(oct->level == LVL_2)  // allowed to add bodies to this level
 	{
-		if(oct->mass != NULL)  // do I have child octants or body arrays
+		index = oct->leaf_count;
+		if(index > AREA_CAPACITY)
 		{
-				oct->mass = body->mass;
-
-				oct->pos_x = body->pos_x;
-				oct->pos_y = body->pos_y;
-				oct->pos_z = body->pos_z;
-
-				oct->vel_x = body->vel_x;
-				oct->vel_y = body->vel_y;
-				oct->vel_z = body->vel_z;
+			printf("\n\tERROR: Suboctant body capacity exceeded!\n");
+			printf("\tPLEASE rebuild with wider arrays in octant struct!\n");
+			return KILL;
 		}
+		else
+		{
+			// add the body to the suboctant arrays
+			oct->mass[index]  = body->mass;
+
+			oct->pos_x[index] = body->pos_x;
+			oct->pos_y[index] = body->pos_y;
+			oct->pos_z[index] = body->pos_z;
+
+			oct->vel_x[index] = body->vel_x;
+			oct->vel_y[index] = body->vel_y;
+			oct->vel_z[index] = body->vel_z;
+
+			oct->leaf_count = index + 1;  // increment leaf count, don't care if at capacity for this iteration
+
+			return PASS;
+		}
+	}
+	else  //  improper call
+	{
+		return SKIP;
 	}
 }
 
