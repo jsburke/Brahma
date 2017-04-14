@@ -1,7 +1,7 @@
 #include "cpu_simple.h"
 
 //  Check asm after compile for below, want to try to keep everything in registers
-void   body_body_accum_accel(int focus, int other, p_octant oct)  //  always calc as force on other from focus
+void	body_body_accum_accel(int focus, int other, p_octant oct)  //  always calc as force on other from focus
 {
 	//  get the distance vectors, scalar distance
 	data_t r_x, r_y, r_z, r;
