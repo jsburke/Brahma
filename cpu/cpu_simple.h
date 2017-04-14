@@ -13,8 +13,8 @@ const data_t GRAV_CONST = 6.674e-11;
 void 	body_body_accum_accel(int focus, int other, p_octant oct);
 void 	body_oct_accum_accel(p_octant local, int body, p_octant distal);
 
-void	body_pos_update(int body, p_octant oct);
-void	body_vel_update(int body, p_octant oct);
+void	body_pos_update(int body, p_octant oct, int time);
+void	body_vel_update(int body, p_octant oct, int time);
 //  not doing accumulation of acceleration since we only need three divides and accums
 
 #endif

@@ -69,3 +69,9 @@ void 	body_oct_accum_accel(p_octant local, int body, p_octant distal)
 	local->acc_y[body] += F_y / mass;
 	local->acc_z[body] += F_z / mass;
 }
+
+void	body_pos_update(int body, p_octant oct, int time)
+{}
+
+void	body_vel_update(int body, p_octant oct, int time)
+{}
