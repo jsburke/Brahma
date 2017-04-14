@@ -16,13 +16,13 @@
 #define PASS 		  1
 #define SKIP 		  2
 
-int nbody_enum(nbody *body_array[], char* file)  //  True - False response
+int nbody_enum(nbody *body_array, char* file)  //  PASS - KILL response
 {
 	FILE *fp;
 	if((fp = fopen(file, "r")) == NULL)
 	{
 		printf("\nFile could not be opened\n");
-		return 0;
+		return KILL;
 	}
 
 	int i = 0;
@@ -36,31 +36,31 @@ int nbody_enum(nbody *body_array[], char* file)  //  True - False response
         // nbodies[i].category = tmp;
 
         tmp = strtok(NULL, ",");
-        nbodies[i].mass = atof(tmp);
+        nbodies[i]->mass = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].pos_x = atof(tmp);
+        nbodies[i]->pos_x = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].pos_y = atof(tmp);
+        nbodies[i]->pos_y = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].pos_z = atof(tmp);
+        nbodies[i]->pos_z = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].vel_x = atof(tmp);
+        nbodies[i]->vel_x = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].vel_y = atof(tmp);
+        nbodies[i]->vel_y = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].vel_z = atof(tmp);
+        nbodies[i]->vel_z = atof(tmp);
 
         i++;
 	}
 	free(buf);
 	fclose(fp);
-	return 1;
+	return PASS;
 }
 
 //  code for octants
