@@ -70,8 +70,12 @@ void 	body_oct_accum_accel(p_octant local, int body, p_octant distal)
 	local->acc_z[body] += F_z / mass;
 }
 
-void	body_pos_update(int body, p_octant oct, time_t time)
-{}
+void	body_pos_update(int body, p_octant oct, time_t timestep)
+{
+	oct->pos_x[body] += DISPLACE(oct->vel_x[body], oct->acc_x[body], timestep);
+	oct->pos_y[body] += DISPLACE(oct->vel_y[body], oct->acc_y[body], timestep);
+	oct->pos_z[body] += DISPLACE(oct->vel_z[body], oct->acc_z[body], timestep);
+}
 
 void	body_vel_update(int body, p_octant oct, time_t time)
 {}
