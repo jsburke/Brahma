@@ -20,4 +20,18 @@ void   body_body_accum_accel(int focus, int other, p_octant oct)  //  always cal
 	F_x = F_part * r_x;
 	F_y = F_part * r_y;
 	F_z = F_part * r_z;
+
+	//  Acceleration accumulations
+
+	data_t mass = oct->mass[focus];
+
+	oct->acc_x[focus] += F_x / mass;
+	oct->acc_y[focus] += F_y / mass;
+	oct->acc_z[focus] += F_z / mass;
+
+	data_t mass = oct->mass[other];
+
+	oct->acc_x[other] += F_x / mass;
+	oct->acc_y[other] += F_y / mass;
+	oct->acc_z[other] += F_z / mass;
 }
