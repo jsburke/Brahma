@@ -39,3 +39,33 @@ void   body_body_accum_accel(int focus, int other, p_octant oct)  //  always cal
 	oct->acc_z[other] += -F_z / mass;
 }
 
+// not a fan of below because breaks DRY, try to find more elegant solution
+void 	body_oct_accum_accel(p_octant local, int body, p_octant distal)
+{
+	//  get the distance vectors, scalar distance
+	data_t r_x, r_y, r_z, r;
+
+	r_x = -((local->pos_x[body]) - (distal->mass_center_x));
+	r_y = -((local->pos_y[body]) - (distal->mass_center_y));
+	r_z = -((local->pos_z[body]) - (distal->mass_center_z));
+
+	r 	= DISTANCE(r_x, r_y, r_z);
+
+	//  Force calculations
+
+	data_t F_x, F_y, F_z, F_part;
+
+	F_part = FORCE_PARTIAL(local->mass[body], distal->mass_total, r);
+
+	F_x = F_part * r_x;
+	F_y = F_part * r_y;
+	F_z = F_part * r_z;
+
+	//  Acceleration accumulations
+
+	data_t mass = local->mass[body];
+
+	local->acc_x[body] += F_x / mass;
+	local->acc_y[body] += F_y / mass;
+	local->acc_z[body] += F_z / mass;
+}
