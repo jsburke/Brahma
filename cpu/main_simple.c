@@ -61,6 +61,10 @@ int main(int argc, char *argv[])
 		p++;
 	}
 
+	//  get bodies from file
+	bodies = (nbody*) malloc(sizeof(nbody) * num_bodies);
+	if( KILL == nbody_enum(bodies, filename)) return 0;  // exit on failure
+	free(filename);  //  file will no longer be accessed
 
 	return 0;
 }
