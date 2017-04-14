@@ -78,4 +78,8 @@ void	body_pos_update(int body, p_octant oct, time_t timestep)
 }
 
 void	body_vel_update(int body, p_octant oct, time_t time)
-{}
+{
+	oct->vel_x[body] += oct->acc_x[body] * timestep;
+	oct->vel_y[body] += oct->acc_y[body] * timestep;
+	oct->vel_z[body] += oct->acc_z[body] * timestep;
+}
