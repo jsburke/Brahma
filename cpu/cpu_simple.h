@@ -4,9 +4,9 @@
 #include "../octree/octree.h"
 
 //  Functions for the math that will be needed
-data_t 		body_body_distance(int focus, int other);
-data_t 		body_body_force(int focus, int other);
-data_t 		body_body_accum_accel(int focus, int other);
+data_t 		body_body_distance(int focus, int other, p_octant oct);
+data_t 		body_body_force(int focus, int other, p_octant oct);
+data_t 		body_body_accum_accel(int focus, int other, p_octant oct);
 
 data_t 		body_oct_distance(int body, p_octant oct);
 data_t 		body_oct_force(int body, p_octant oct);
