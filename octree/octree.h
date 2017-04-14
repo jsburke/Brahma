@@ -50,6 +50,10 @@ typedef struct octant
 	data_t 	*vel_y;
 	data_t 	*vel_z;
 
+	data_t 	*acc_x;
+	data_t 	*acc_y;
+	data_t 	*acc_z;
+
 } octant, *p_octant;  //  octant is a cube divided into 8 cubes inside it of equal size
 
 p_octant 	octant_new(int oct_no, octype level);
