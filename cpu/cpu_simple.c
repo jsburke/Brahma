@@ -1,6 +1,8 @@
 #include "cpu_simple.h"
 #include <math.h>
 
+const data_t GRAV_CONST = 6.674e-11;
+
 data_t body_body_distance(int focus, int other, p_octant oct)
 {
 	// first get the orthogonal diffs
@@ -10,4 +12,14 @@ data_t body_body_distance(int focus, int other, p_octant oct)
 
 	// square and squareroot
 	return sqrt(x_diff*x_diff + y_diff*y_diff + z_diff*z_diff);
+}
+
+data_t body_body_force(int focus, int other, p_octant oct)
+{
+	data_t distance = body_body_distance(focus, other, oct);
+	data_t dist_sq	= distance * distance;
+
+	//  G * (m1 * m2) / r^2
+
+	return GRAV_CONST * (((oct->mass[focus]) * (oct->mass[other])) / dist_sq);
 }
