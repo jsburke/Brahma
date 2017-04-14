@@ -265,3 +265,19 @@ int octant_move_leaf(p_octant src, p_octant dst, int src_index)
 	else  // improper octant type passed
 	return SKIP;
 }
+
+void octant_acceleration_zero(p_octant oct)  // use so that we can do a simple += in force calc
+{
+	if(oct->level == LVL_2)  // just a quick check, don't care if not L2
+	{
+		int i;
+		int leaf_count = oct->leaf_count;
+
+		for(i = 0; i < leaf_count; i++)
+		{
+			oct->acc_x[i] = 0;
+			oct->acc_y[i] = 0;
+			oct->acc_z[i] = 0;
+		}
+	}
+}
