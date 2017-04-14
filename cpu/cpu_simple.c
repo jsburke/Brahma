@@ -29,9 +29,11 @@ void   body_body_accum_accel(int focus, int other, p_octant oct)  //  always cal
 	oct->acc_y[focus] += F_y / mass;
 	oct->acc_z[focus] += F_z / mass;
 
+	//  for other body, remember equal and opposite, Newton No. 3
+
 	data_t mass = oct->mass[other];
 
-	oct->acc_x[other] += F_x / mass;
-	oct->acc_y[other] += F_y / mass;
-	oct->acc_z[other] += F_z / mass;
+	oct->acc_x[other] += -F_x / mass;
+	oct->acc_y[other] += -F_y / mass;
+	oct->acc_z[other] += -F_z / mass;
 }
