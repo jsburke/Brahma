@@ -7,7 +7,7 @@
 const data_t GRAV_CONST = 6.674e-11;
 
 //  Functions & Macros for the math that will be needed
-#define BODY_BODY_DISTANCE(r_x, r_y, r_z) sqrt((r_x * r_x) + (r_y * r_y) + (r_z * r_z))
+#define DISTANCE(r_x, r_y, r_z) sqrt((r_x * r_x) + (r_y * r_y) + (r_z * r_z))
 #define FORCE_PARTIAL(m1, m2, r) GRAV_CONST * ((m1 * m2)/(r * r * r))
 void 	body_body_accum_accel(int focus, int other, p_octant oct);
 

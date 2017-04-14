@@ -1,5 +1,6 @@
 #include "cpu_simple.h"
 
+//  Check asm after compile for below, want to try to keep everything in registers
 void   body_body_accum_accel(int focus, int other, p_octant oct)  //  always calc as force on other from focus
 {
 	//  get the distance vectors, scalar distance
@@ -9,7 +10,7 @@ void   body_body_accum_accel(int focus, int other, p_octant oct)  //  always cal
 	r_y = -((oct->pos_y[focus]) - (oct->pos_y[other]));  // will be trampled by squaring in macro
 	r_z = -((oct->pos_z[focus]) - (oct->pos_z[other]));  // for distance anyhow
 
-	r 	= BODY_BODY_DISTANCE(r_x, r_y, r_z);
+	r 	= DISTANCE(r_x, r_y, r_z);
 
 	//  Force calculations
 
@@ -37,3 +38,4 @@ void   body_body_accum_accel(int focus, int other, p_octant oct)  //  always cal
 	oct->acc_y[other] += -F_y / mass;
 	oct->acc_z[other] += -F_z / mass;
 }
+
