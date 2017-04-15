@@ -19,7 +19,7 @@
 // Step 1:
 //			Read the input file and generate an array of bodies
 // Step 2:
-//			Build tree from octant structs from the bottom to top
+//			Build tree from octant structs
 //			Populate the Level 2 nodes with leaves, AKA suns, moons, &c
 //			Calculate non-Root node mass attributes
 // Step 3:
@@ -34,9 +34,16 @@
 
 int main(int argc, char *argv[])
 {
+	/////////////////
+	//
+	//  PART 1
+	//
+	/////////////////
+
 	//  grab and process the file from command line
 	char*		filename = (char*) malloc(sizeof(char) * FILENAME_LEN);
 	nbody*		bodies;
+	int 		i, j;
 	int 		num_bodies = 0;
 
 	if(argc != 2)
@@ -65,6 +72,26 @@ int main(int argc, char *argv[])
 	bodies = (nbody*) malloc(sizeof(nbody) * num_bodies);
 	if( KILL == nbody_enum(bodies, filename)) return 0;  // exit on failure
 	free(filename);  //  file will no longer be accessed
+
+	/////////////////
+	//
+	//  PART 2
+	//
+	/////////////////
+
+	p_octant root_oct = octant_new(-1, ROOT);
+	if(!root_oct) return 0;
+
+	p_octant root_children = root_oct->children;  // store pointer to reduce one layer of chasing
+
+	// don't like the below loop, feels like it encourages pointer chasing
+	for(i = 0; i < 8; i++)
+	{
+		if(NULL == (root_children[i] = octant_new(i, LVL_1))) return 0;
+
+		for(j = 0; j < 8; j++)
+			if(NULL == (root_children[i]->children[j] = octant_new(j, LVL_2))) return 0;
+	}
 
 	return 0;
 }
