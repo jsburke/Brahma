@@ -97,6 +97,10 @@ p_octant octant_new(int oct_no, octype level)
 		oct->vel_y = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
 		oct->vel_z = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
 
+		oct->acc_x = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
+		oct->acc_y = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
+		oct->acc_z = (data_t*) malloc(AREA_CAPACITY * sizeof(data_t));
+
 		oct->children  = NULL;  // has leaves not child octants
 	}else  // ROOT or LVL_1
 	{
@@ -112,6 +116,10 @@ p_octant octant_new(int oct_no, octype level)
 		oct->vel_y = (data_t*) NULL;
 		oct->vel_z = (data_t*) NULL;
 
+		oct->acc_x = (data_t*) NULL;
+		oct->acc_y = (data_t*) NULL;
+		oct->acc_z = (data_t*) NULL;
+
 		oct->children = (p_octant) malloc(CHILD_COUNT * sizeof(octant));
 	}
 
@@ -124,9 +132,9 @@ void octant_center_of_mass(p_octant oct)  // maybe center of gravity
 	{
 		int i;
 		data_t mass_total = 0;
-		data_t x_acc = 0;
-		data_t y_acc = 0;
-		data_t z_acc = 0;
+		data_t x_accum 	  = 0;
+		data_t y_accum 	  = 0;
+		data_t z_accum 	  = 0;
 
 		if(oct->level == LVL_2)  //  for nodes with leafs
 		{
@@ -136,27 +144,27 @@ void octant_center_of_mass(p_octant oct)  // maybe center of gravity
 			// calc total mass, weight positions
 			for(i = 0; i < leaf_count; i++)
 			{
-				mass_total += oct->mass[i];
-				x_acc      += (oct->pos_x[i] * oct->mass[i]);
-				y_acc      += (oct->pos_y[i] * oct->mass[i]);
-				z_acc      += (oct->pos_z[i] * oct->mass[i]);
+				mass_total 	 += oct->mass[i];
+				x_accum      += (oct->pos_x[i] * oct->mass[i]);
+				y_accum      += (oct->pos_y[i] * oct->mass[i]);
+				z_accum      += (oct->pos_z[i] * oct->mass[i]);
 			}
 		}
 		else  // calculate from children
 		{
 			for(i = 0; i < 8; i++)  //octants with suboctants
 			{
-				mass_total += oct->children[i].mass_total;
-				x_acc      += (oct->childre[i].mass_center_x * oct->children[i].mass_total);
-				y_acc      += (oct->childre[i].mass_center_y * oct->children[i].mass_total);
-				z_acc      += (oct->childre[i].mass_center_z * oct->children[i].mass_total);
+				mass_total 	 += oct->children[i].mass_total;
+				x_accum      += (oct->childre[i].mass_center_x * oct->children[i].mass_total);
+				y_accum      += (oct->childre[i].mass_center_y * oct->children[i].mass_total);
+				z_accum      += (oct->childre[i].mass_center_z * oct->children[i].mass_total);
 			}
 		}
 		
 		oct->mass_total    = mass_total; 
-		oct->mass_center_x = x_acc/mass_total;
-		oct->mass_center_y = y_acc/mass_total;
-		oct->mass_center_z = z_acc/mass_total;
+		oct->mass_center_x = x_accum/mass_total;
+		oct->mass_center_y = y_accum/mass_total;
+		oct->mass_center_z = z_accum/mass_total;
 	}
 }
 
@@ -188,6 +196,10 @@ int octant_add_body(p_octant oct, nbody *body)  //returns true-false that may te
 			oct->vel_x[index] = body->vel_x;
 			oct->vel_y[index] = body->vel_y;
 			oct->vel_z[index] = body->vel_z;
+
+			oct->acc_x[index] = 0;
+			oct->acc_y[index] = 0;
+			oct->acc_z[index] = 0;
 
 			oct->leaf_count = index + 1;  // increment leaf count, don't care if at capacity for this iteration
 
@@ -227,6 +239,8 @@ int octant_move_leaf(p_octant src, p_octant dst, int src_index)
 			dst->vel_y[dst_index] = src->vel_y[src_index];
 			dst->vel_z[dst_index] = src->vel_z[src_index];
 
+			// don't copy acceleration vectors, will zero out later
+
 			dst->leaf_count = dst_index + 1;  // note body addition
 
 			//remove leaf from source and compress arrays
@@ -242,10 +256,28 @@ int octant_move_leaf(p_octant src, p_octant dst, int src_index)
 			src->vel_y[src_index] = src->vel_y[src_end];
 			src->vel_z[src_index] = src->vel_z[src_end];
 
+			// again, not copying acceleration vectors
+
 			src->leaf_count = src_end - 1;
 			return PASS;	
 		}
 	}
 	else  // improper octant type passed
 	return SKIP;
+}
+
+void octant_acceleration_zero(p_octant oct)  // use so that we can do a simple += in force calc
+{
+	if(oct->level == LVL_2)  // just a quick check, don't care if not L2
+	{
+		int i;
+		int leaf_count = oct->leaf_count;
+
+		for(i = 0; i < leaf_count; i++)
+		{
+			oct->acc_x[i] = 0;
+			oct->acc_y[i] = 0;
+			oct->acc_z[i] = 0;
+		}
+	}
 }
