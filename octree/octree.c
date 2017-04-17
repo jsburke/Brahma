@@ -336,17 +336,31 @@ octant_pair octant_locate(data_t body_x, data_t body_y, data_t body_z)
 
 int octree_rebuild(p_octant root)
 {
-	int i, j, leaf_count;
-	p_octant root_children = root->children;
-	p_octant source, dest;
+	int 			i, j, k, leaf_count, dest_parent, dest_child;
+	int 			check;
+	p_octant 		root_children = root->children;
+	p_octant 		source, dest;
+	octant_pair 	location_now;
 
 
 	for(i = 0; i < CHILD_COUNT; i++)
 	{
 		for(j = 0; j < CHILD_COUNT; j++)
 		{
-			source = root_children[i]->children[j];
+			source 	   = root_children[i]->children[j];
+			leaf_count = source->leaf_count;
+			for(k = 0; k < leaf_count; k++)
+			{
+				location_now = octant_locate(source->pos_x[k], source->pos_y[k], source->pos_z[k]);
 
+				if((location_now.parent != i) || (location_now.child != j))
+				{
+					dest  = root_children[location_now.parent]->children[location_now.child];
+					check = octant_move_leaf(source, dest, k);
+
+					if(KILL == check) return KILL;
+				}
+			}
 		}
 
 	}
