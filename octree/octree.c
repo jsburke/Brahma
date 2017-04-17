@@ -281,3 +281,56 @@ void octant_acceleration_zero(p_octant oct)  // use so that we can do a simple +
 		}
 	}
 }
+
+octant_pair octant_locate(data_t body_x, data_t body_y, data_t body_z)
+{
+	data_t upper_x, lower_x, half_x upper_y, lower_y, half_y upper_z, lower_z, half_z;
+	octant_pair result;
+
+	if(body_x >= 0) 
+	{
+		result.parent 	+= 1;
+		upper_x 		= MAX_POS_POSITION;
+		half_x  		= POS_QUARTER_MARK;
+		lower_x 		= 0;
+	}
+	else
+	{
+		upper_x 		= 0;
+		half_x  		= NEG_QUARTER_MARK;
+		lower_x 		= MAX_NEG_POSITION;
+	}
+	result.child 		+= (body_x >= half_x) 1 : 0;
+
+	if(body_y >= 0)
+	{
+		result.parent 	+= 2;
+		upper_y 		= MAX_POS_POSITION;
+		half_y  		= POS_QUARTER_MARK;
+		lower_y 		= 0;
+	}
+	else
+	{
+		upper_y 		= 0;
+		half_y  		= NEG_QUARTER_MARK;
+		lower_y 		= MAX_NEG_POSITION;
+	}
+	result.child 		+= (body_y >= half_y) 2 : 0;
+
+	if(body_z >= 0)
+	{
+		result.parent 	+= 4;
+		upper_z 		= MAX_POS_POSITION;
+		half_z  		= POS_QUARTER_MARK;
+		lower_z 		= 0;
+	}
+	else
+	{
+		upper_z 		= 0;
+		half_z  		= NEG_QUARTER_MARK;
+		lower_z 		= MAX_NEG_POSITION;
+	}
+	result.child 		+= (body_z >= half_z) 4 : 0;
+
+	return result;
+}
