@@ -48,8 +48,8 @@ CERES_MASS			= 8.958e20
 EARTH_VELOCITY		= 30		# km/s
 								# around sun
 
-MAX_POS_DOUBLE		= 1.7e308
-MAX_NEG_DOUBLE		= -1.7e308
+MAX_POS_DOUBLE		= 1.5e200
+MAX_NEG_DOUBLE		= -MAX_POS_DOUBLE
 LOW_TOL				= 0.15		# tolerances so we don't start at screen edges
 HIGH_TOL			= 0.85
 
