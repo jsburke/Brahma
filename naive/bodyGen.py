@@ -48,8 +48,10 @@ CERES_MASS			= 8.958e20
 EARTH_VELOCITY		= 30		# km/s
 								# around sun
 
-MAX_POS_DOUBLE		= 1.5e200
-MAX_NEG_DOUBLE		= -MAX_POS_DOUBLE
+# below is slightly misnamed, just boundaries for locating planets initially
+# shrinking for 32 bit float usage
+MAX_POS_VAL			= 1.5e20
+MAX_NEG_POS_VAL		= -MAX_POS_VAL
 LOW_TOL				= 0.15		# tolerances so we don't start at screen edges
 HIGH_TOL			= 0.85
 
@@ -102,7 +104,7 @@ MINOR_VELOCITY_MAX	= 21 * EARTH_VELOCITY
 #--------------------------------------------------------
 
 def pos_rand():
-	return random.uniform(LOW_TOL * MAX_POS_DOUBLE, HIGH_TOL * MAX_POS_DOUBLE) 
+	return random.uniform(LOW_TOL * MAX_POS_VAL, HIGH_TOL * MAX_POS_VAL) 
 
 def vel_scale(v):
 	return math.sqrt(v)
