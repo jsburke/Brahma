@@ -1,0 +1,5 @@
+general notes for wrie up from john
+
+displacement per time step
+
+using t*(v_i + 0.5*a*t) since it is one less multiply than v_i*t + 0.5 * a * t 
