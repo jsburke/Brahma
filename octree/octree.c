@@ -334,7 +334,20 @@ octant_pair octant_locate(data_t body_x, data_t body_y, data_t body_z)
 	return result;
 }
 
-void octree_rebuild(p_octant root)
+int octree_rebuild(p_octant root)
 {
+	int i, j, leaf_count;
+	p_octant root_children = root->children;
+	p_octant source, dest;
 
+
+	for(i = 0; i < CHILD_COUNT; i++)
+	{
+		for(j = 0; j < CHILD_COUNT; j++)
+		{
+			source = root_children[i]->children[j];
+
+		}
+
+	}
 }
