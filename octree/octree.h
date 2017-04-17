@@ -89,7 +89,7 @@ int 		octant_add_body(p_octant oct, nbody* body);
 int 		octant_move_leaf(p_octant src, p_octant dst, int offset);
 
 void 		octant_acceleration_zero(p_octant oct);
-void		octree_rebuild(p_octant root);
+int 		octree_rebuild(p_octant root);
 octant_pair octant_locate(data_t pos_x, data_t pos_y, data_t pos_z);
 
 #endif
