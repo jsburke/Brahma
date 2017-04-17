@@ -3,11 +3,13 @@
 #include <ctype.h>
 #include "cpu_simple.h"
 
-#define REBUILD_FREQ			5		// Rebuild after every X iterations
-#define TIME_STEP 				30  	// in simulation time, in minutes
-#define EXIT_COUNT				200 	// Number of iterations to do before exiting, -1 for infinite
+#define REBUILD_FREQ			5				// Rebuild after every X iterations
+#define TIME_STEP 				30  			// in simulation time, in minutes
+#define EXIT_COUNT				200 			// Number of iterations to do before exiting, -1 for infinite
 #define FILENAME_LEN 			256
-#define ERROR 					-1 		// Generic Error val for readability
+#define ERROR 					-1 				// Generic Error val for readability
+
+#define SECS					TIME_STEP * 60	// seconds per time step
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -55,7 +57,7 @@ int main(int argc, char *argv[])
 	//  grab and process the file from command line
 	char*		filename = (char*) malloc(sizeof(char) * FILENAME_LEN);
 	nbody*		bodies;
-	int 		i, j;
+	int 		i, j, k;
 	int 		num_bodies = 0;
 
 	if(argc != 2)
@@ -193,11 +195,62 @@ int main(int argc, char *argv[])
 	//
 	/////////////////
 
+	p_octant oct_focus;
+	int index, comp, leaf_count;
+
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
 		if((i % REBUILD_FREQ) == 0) // time to rebuild tree!
 		{
 			octree_rebuild(root);
+		}
+
+		// calculate & clear accelerations
+		// update position and velocities
+		for(j = 0; j < CHILDREN_PER_OCTANT; j++)
+		{
+			for(k = 0; k < CHILDREN_PER_OCTANT; k++)
+			{
+				oct_focus  = root_children[j]->children[k];
+				leaf_count = focus->leaf_count;
+
+				// accumulate accelerations
+				for(index = 0; index < leaf_count; index++)
+				{
+					// first bodies in the suboctant
+					for(comp = index + 1; comp < leaf_count; comp++)
+						body_body_accum_accel(index, comp, oct_focus);
+
+					// then to local suboctants
+					for(comp = 0; comp < CHILDREN_PER_OCTANT; comp++)
+						if(comp != k) body_oct_accum_accel(oct_focus, index, root_children[j]->children[comp]);
+
+					// then for distal LVL 1 octants
+					for(comp = 0; comp < CHILDREN_PER_OCTANT; comp++)
+						if(comp != j) body_oct_accum_accel(oct_focus, index, root_children[comp]);
+				}
+
+				//  update positions & velocities
+				for(index = 0; index < leaf_count; index++)
+				{
+					body_pos_update(index, oct_focus, SECS);
+					body_vel_update(index, oct_focus, SECS);
+				}
+
+				// clear accelerations
+				octant_acceleration_zero(oct_focus);
+			}
+		}
+
+		//recalculate centers of mass
+		//  reevaluate loop
+		//  NOT DRY with preloop
+		for(j = 0; j < CHILDREN_PER_OCTANT; j++)
+		{
+			for(k = 0; k < CHILDREN_PER_OCTANT; k++)
+				octant_center_of_mass(root_children[j]->children[k]);
+
+			octant_center_of_mass(root_children[j]);
 		}
 	}
 
