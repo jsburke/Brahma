@@ -20,6 +20,7 @@ typedef data_t   float; // change me below on type change!! SUPER IMPORTANT
 #define NEG_QUARTER_MARK 		-POS_QUARTER_MARK
 
 typedef enum octype {ROOT, LVL_1, LVL_2} octant_type;  //  LVL_2 has no octant children, but uses body arrays
+#define CHILDREN_PER_OCTANT 	8
 
 //  body struct for reading from file
 
@@ -50,7 +51,7 @@ typedef struct octant
 	data_t 	mass_total;
 
 	// children
-	octant 	*children[8];  //  NULL if level above planets
+	octant 	*children[CHILDREN_PER_OCTANT];  //  NULL if level above planets
 
 	// leaf arrays
 	// malloc to create array
