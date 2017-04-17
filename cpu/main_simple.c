@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
 	free(bodies);
 
 	//  Center of mass calculations
-
+	//  See below note on DRY issue here
 	for(i = 0; i < CHILD_COUNT; i++)
 	{
 		// center of mass for LVL 2 nodes
@@ -196,13 +196,14 @@ int main(int argc, char *argv[])
 	/////////////////
 
 	p_octant oct_focus;
-	int index, comp, leaf_count;
+	int index, comp, leaf_count, check;
 
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
 		if((i % REBUILD_FREQ) == 0) // time to rebuild tree!
 		{
-			octree_rebuild(root);
+			check = octree_rebuild(root);
+			if(KILL == check) return 0;
 		}
 
 		// calculate & clear accelerations
