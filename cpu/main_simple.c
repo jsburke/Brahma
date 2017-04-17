@@ -97,11 +97,11 @@ int main(int argc, char *argv[])
 	p_octant root_children = root_oct->children;  // store pointer to reduce one layer of chasing
 
 	// don't like the below loop, feels like it encourages pointer chasing
-	for(i = 0; i < 8; i++)
+	for(i = 0; i < CHILDREN_PER_OCTANT; i++)
 	{
 		if(NULL == (root_children[i] = octant_new(i, LVL_1))) return 0;
 
-		for(j = 0; j < 8; j++)
+		for(j = 0; j < CHILDREN_PER_OCTANT; j++)
 			if(NULL == (root_children[i]->children[j] = octant_new(j, LVL_2))) return 0;
 	}
 
@@ -174,6 +174,18 @@ int main(int argc, char *argv[])
 	}
 
 	free(bodies);
+
+	//  Center of mass calculations
+
+	for(i = 0; i < CHILDREN_PER_OCTANT; i++)
+	{
+		// center of mass for LVL 2 nodes
+		for(j = 0; j < CHILDREN_PER_OCTANT; j++)
+			octant_center_of_mass(root_children[i]->children[j]);
+
+		//  center of mass for parent of what was just done
+		octant_center_of_mass(root_children[i]);
+	}
 
 	return 0;
 }
