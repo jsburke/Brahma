@@ -5,7 +5,7 @@
 
 #define REBUILD_FREQ			5		// Rebuild after every X iterations
 #define TIME_STEP 				30  	// in simulation time, in minutes
-#define EXIT_COUNT				200 	// Number of iterations to do before exiting, maybe 0 or -1 for infinite
+#define EXIT_COUNT				200 	// Number of iterations to do before exiting, -1 for infinite
 #define FILENAME_LEN 			256
 #define ERROR 					-1 		// Generic Error val for readability
 
@@ -185,6 +185,20 @@ int main(int argc, char *argv[])
 
 		//  center of mass for parent of what was just done
 		octant_center_of_mass(root_children[i]);
+	}
+
+	/////////////////
+	//
+	//  PART 3
+	//
+	/////////////////
+
+	for(i = 0; i < EXIT_COUNT; i++)
+	{
+		if((i % REBUILD_FREQ) == 0) // time to rebuild tree!
+		{
+			octree_rebuild(root);
+		}
 	}
 
 	return 0;
