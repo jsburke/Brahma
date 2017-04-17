@@ -22,6 +22,5 @@ void 	body_oct_accum_accel(p_octant local, int body, p_octant distal);
 
 void	body_pos_update(int body, p_octant oct, time_t time);
 void	body_vel_update(int body, p_octant oct, time_t time);
-//  not doing accumulation of acceleration since we only need three divides and accums
 
 #endif
