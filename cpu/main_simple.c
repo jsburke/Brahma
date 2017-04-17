@@ -106,6 +106,7 @@ int main(int argc, char *argv[])
 	}
 
 	//  place the leaves in suboctants
+	//  subroutine prosepctively designed
 	data_t upper_x, lower_x, half_x upper_y, lower_y, half_y upper_z, lower_z, half_z;
 	int octant, suboctant;
 	data_t body_x, body_y, body_z;

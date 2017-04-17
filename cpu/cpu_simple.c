@@ -83,3 +83,76 @@ void	body_vel_update(int body, p_octant oct, time_t time)
 	oct->vel_y[body] += oct->acc_y[body] * timestep;
 	oct->vel_z[body] += oct->acc_z[body] * timestep;
 }
+
+int 	body_alloc(p_octant root, nbody *bodies[], int num_bodies)
+{
+	data_t upper_x, lower_x, half_x upper_y, lower_y, half_y upper_z, lower_z, half_z;
+	int octant, suboctant;
+	data_t body_x, body_y, body_z;
+	int i;
+	p_octant root_children = root->children;
+
+	for(i = 0; i < num_bodies; i++)
+	{
+		octant 		= 0;
+		suboctant 	= 0;
+
+		body_x = bodies[i]->pos_x;
+		body_y = bodies[i]->pos_y;
+		body_z = bodies[i]->pos_z;
+
+		// find location
+
+		if(body_x >= 0) // even octant
+		{
+			octant 	+= 1;
+			upper_x = MAX_POS_POSITION;
+			half_x  = POS_QUARTER_MARK;
+			lower_x = 0;
+		}
+		else
+		{
+			upper_x = 0;
+			half_x  = NEG_QUARTER_MARK;
+			lower_x = MAX_NEG_POSITION;
+		}
+		suboctant += (body_x >= half_x) 1 : 0;
+
+		if(body_y >= 0)
+		{
+			octant 	+= 2;
+			upper_y = MAX_POS_POSITION;
+			half_y  = POS_QUARTER_MARK;
+			lower_y = 0;
+		}
+		else
+		{
+			upper_y = 0;
+			half_y  = NEG_QUARTER_MARK;
+			lower_y = MAX_NEG_POSITION;
+		}
+		suboctant += (body_y >= half_y) 2 : 0;
+
+		if(body_z >= 0)
+		{
+			octant 	+= 4;
+			upper_z = MAX_POS_POSITION;
+			half_z  = POS_QUARTER_MARK;
+			lower_z = 0;
+		}
+		else
+		{
+			upper_z = 0;
+			half_z  = NEG_QUARTER_MARK;
+			lower_z = MAX_NEG_POSITION;
+		}
+		suboctant += (body_z >= half_z) 4 : 0;
+
+		if(KILL == octant_add_body(root_children[octant]->children[suboctant], bodies[i]))
+		{
+			return KILL;
+		}
+	}
+
+	return PASS;
+}

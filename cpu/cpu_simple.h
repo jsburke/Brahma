@@ -15,7 +15,7 @@ const data_t GRAV_CONST = 6.674e-11;
 // NB : expansion below is one MUL less than direct implementation
 #define DISPLACE(vel, accel, time) time * (vel + (0.5 * accel * time))
 
-int 	body_alloc(p_octant root, nbody *bodies[]);
+int 	body_alloc(p_octant root, nbody *bodies[], int num_bodies);
 
 void 	body_body_accum_accel(int focus, int other, p_octant oct);
 void 	body_oct_accum_accel(p_octant local, int body, p_octant distal);
