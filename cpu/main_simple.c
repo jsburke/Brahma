@@ -7,6 +7,7 @@
 #define TIME_STEP 				30  	// in simulation time, in minutes
 #define EXIT_COUNT				200 	// Number of iterations to do before exiting, maybe 0 or -1 for infinite
 #define FILENAME_LEN 			256
+#define ERROR 					-1 		// Generic Error val for readability
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -103,6 +104,75 @@ int main(int argc, char *argv[])
 		for(j = 0; j < 8; j++)
 			if(NULL == (root_children[i]->children[j] = octant_new(j, LVL_2))) return 0;
 	}
+
+	//  place the leaves in suboctants
+	data_t upper_x, lower_x, half_x upper_y, lower_y, half_y upper_z, lower_z, half_z;
+	int octant, suboctant;
+	data_t body_x, body_y, body_z;
+
+	for (i = 0; i < num_bodies; i++)
+	{
+		octant 		= 0;
+		suboctant 	= 0;
+
+		body_x = bodies[i]->pos_x;
+		body_y = bodies[i]->pos_y;
+		body_z = bodies[i]->pos_z;
+
+		// find location
+
+		if(body_x >= 0) // even octant
+		{
+			octant 	+= 1;
+			upper_x = MAX_POS_POSITION;
+			half_x  = POS_QUARTER_MARK;
+			lower_x = 0;
+		}
+		else
+		{
+			upper_x = 0;
+			half_x  = NEG_QUARTER_MARK;
+			lower_x = MAX_NEG_POSITION;
+		}
+		suboctant += (body_x >= half_x) 1 : 0;
+
+		if(body_y >= 0)
+		{
+			octant 	+= 2;
+			upper_y = MAX_POS_POSITION;
+			half_y  = POS_QUARTER_MARK;
+			lower_y = 0;
+		}
+		else
+		{
+			upper_y = 0;
+			half_y  = NEG_QUARTER_MARK;
+			lower_y = MAX_NEG_POSITION;
+		}
+		suboctant += (body_y >= half_y) 2 : 0;
+
+		if(body_z >= 0)
+		{
+			octant 	+= 4;
+			upper_z = MAX_POS_POSITION;
+			half_z  = POS_QUARTER_MARK;
+			lower_z = 0;
+		}
+		else
+		{
+			upper_z = 0;
+			half_z  = NEG_QUARTER_MARK;
+			lower_z = MAX_NEG_POSITION;
+		}
+		suboctant += (body_z >= half_z) 4 : 0;
+
+		if(KILL == octant_add_body(root_children[octant]->children[suboctant], bodies[i]))
+		{
+			return 0;
+		}
+	}
+
+	free(bodies);
 
 	return 0;
 }
