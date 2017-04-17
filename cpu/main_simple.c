@@ -99,11 +99,11 @@ int main(int argc, char *argv[])
 	p_octant root_children = root_oct->children;  // store pointer to reduce one layer of chasing
 
 	// don't like the below loop, feels like it encourages pointer chasing
-	for(i = 0; i < CHILDREN_PER_OCTANT; i++)
+	for(i = 0; i < CHILD_COUNT; i++)
 	{
 		if(NULL == (root_children[i] = octant_new(i, LVL_1))) return 0;
 
-		for(j = 0; j < CHILDREN_PER_OCTANT; j++)
+		for(j = 0; j < CHILD_COUNT; j++)
 			if(NULL == (root_children[i]->children[j] = octant_new(j, LVL_2))) return 0;
 	}
 
@@ -179,10 +179,10 @@ int main(int argc, char *argv[])
 
 	//  Center of mass calculations
 
-	for(i = 0; i < CHILDREN_PER_OCTANT; i++)
+	for(i = 0; i < CHILD_COUNT; i++)
 	{
 		// center of mass for LVL 2 nodes
-		for(j = 0; j < CHILDREN_PER_OCTANT; j++)
+		for(j = 0; j < CHILD_COUNT; j++)
 			octant_center_of_mass(root_children[i]->children[j]);
 
 		//  center of mass for parent of what was just done
@@ -207,7 +207,7 @@ int main(int argc, char *argv[])
 
 		// calculate & clear accelerations
 		// update position and velocities
-		for(j = 0; j < CHILDREN_PER_OCTANT; j++)
+		for(j = 0; j < CHILD_COUNT; j++)
 		{
 			for(k = 0; k < CHILDREN_PER_OCTANT; k++)
 			{
@@ -245,7 +245,7 @@ int main(int argc, char *argv[])
 		//recalculate centers of mass
 		//  reevaluate loop
 		//  NOT DRY with preloop
-		for(j = 0; j < CHILDREN_PER_OCTANT; j++)
+		for(j = 0; j < CHILD_COUNT; j++)
 		{
 			for(k = 0; k < CHILDREN_PER_OCTANT; k++)
 				octant_center_of_mass(root_children[j]->children[k]);

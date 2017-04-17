@@ -6,7 +6,6 @@
 #define LINE_LEN 	  256
 #define MASS_INVALID  -1
 #define AREA_CAPACITY 10000  // trying to overallocate
-#define CHILD_COUNT   8
 
 // following are int returns in fashion of t-f
 // skip means the func was called wrongly, but
@@ -333,4 +332,9 @@ octant_pair octant_locate(data_t body_x, data_t body_y, data_t body_z)
 	result.child 		+= (body_z >= half_z) 4 : 0;
 
 	return result;
+}
+
+void octree_rebuild(p_octant root)
+{
+
 }
