@@ -16,6 +16,8 @@ typedef data_t   float; // change me below on type change!! SUPER IMPORTANT
 #endif
 
 #define MAX_NEG_POSITION 		-MAX_POS_POSITION
+#define POS_QUARTER_MARK		MAX_POS_POSITION/2.0 // use 2.0 for float and double data_t
+#define NEG_QUARTER_MARK 		-POS_QUARTER_MARK
 
 typedef enum octype {ROOT, LVL_1, LVL_2} octant_type;  //  LVL_2 has no octant children, but uses body arrays
 
