@@ -1,0 +1,27 @@
+\documentclass[11pt]{article}
+\usepackage{graphicx}
+\usepackage[top=1in, bottom=1.1in, left=1.1in, right=1.1in]{geometry}
+\usepackage{amsmath}
+
+\author{Rashmi Argawal\\
+        Sarthak Jagetia\\
+        John Burke}
+        
+\title{EC527 Final Report: Gravitational N-Body Simulation}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+\paragraph{}
+Newton's Law of Gravitation provides a simple method to calculate the force that two objects exert on each other.  This force is exerted along the line that intersects the two bodies and is directly proportional to the two masses while inversely proportional to the square of the distance separating them, formalized as $F_g = G\frac{m_1m_1}{r^2}$ where \textit{G} is the universal gravitation constant, \textit{m}$_1$ and \textit{m}$_2$  are the masses of the respective objects, and \textit{r} is the distance that separates the two objects.  Following from Newton's Third Law, the forces felt by the two objects will be equal in magnitude and opposite in direction.  Considering only two objects, the calculation itself and updating the position for a given time step is direct.
+
+However, once evaluation is extended to three bodies the main challenge for simulating becomes immediately obvious.  Suddenly, calculating the force each object exerts on every other object is needed to ascertain the net force, which can then be used to update position.  As the number of bodies increases, the number of calculations increases by the square rather than scaling linearly.  For a simulation, this provides an obstacle that can be addressed from multiple angles.
+
+
+
+\begin{thebibliography}{99}
+
+\end{thebibliography}
+\end{document}

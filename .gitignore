@@ -53,3 +53,8 @@ dkms.conf
 *~
 # directory for temps
 build*/
+
+# LaTeX ignores
+*.aux
+*.gz
+*.log

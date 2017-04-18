@@ -6,7 +6,6 @@
 #define LINE_LEN 	  256
 #define MASS_INVALID  -1
 #define AREA_CAPACITY 10000  // trying to overallocate
-#define CHILD_COUNT   8
 
 // following are int returns in fashion of t-f
 // skip means the func was called wrongly, but
@@ -16,13 +15,13 @@
 #define PASS 		  1
 #define SKIP 		  2
 
-int nbody_enum(nbody *body_array[], char* file)  //  True - False response
+int nbody_enum(nbody *body_array, char* file)  //  PASS - KILL response
 {
 	FILE *fp;
 	if((fp = fopen(file, "r")) == NULL)
 	{
 		printf("\nFile could not be opened\n");
-		return 0;
+		return KILL;
 	}
 
 	int i = 0;
@@ -36,31 +35,31 @@ int nbody_enum(nbody *body_array[], char* file)  //  True - False response
         // nbodies[i].category = tmp;
 
         tmp = strtok(NULL, ",");
-        nbodies[i].mass = atof(tmp);
+        nbodies[i]->mass = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].pos_x = atof(tmp);
+        nbodies[i]->pos_x = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].pos_y = atof(tmp);
+        nbodies[i]->pos_y = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].pos_z = atof(tmp);
+        nbodies[i]->pos_z = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].vel_x = atof(tmp);
+        nbodies[i]->vel_x = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].vel_y = atof(tmp);
+        nbodies[i]->vel_y = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        nbodies[i].vel_z = atof(tmp);
+        nbodies[i]->vel_z = atof(tmp);
 
         i++;
 	}
 	free(buf);
 	fclose(fp);
-	return 1;
+	return PASS;
 }
 
 //  code for octants
@@ -279,5 +278,90 @@ void octant_acceleration_zero(p_octant oct)  // use so that we can do a simple +
 			oct->acc_y[i] = 0;
 			oct->acc_z[i] = 0;
 		}
+	}
+}
+
+octant_pair octant_locate(data_t body_x, data_t body_y, data_t body_z)
+{
+	data_t upper_x, lower_x, half_x upper_y, lower_y, half_y upper_z, lower_z, half_z;
+	octant_pair result;
+
+	if(body_x >= 0) 
+	{
+		result.parent 	+= 1;
+		upper_x 		= MAX_POS_POSITION;
+		half_x  		= POS_QUARTER_MARK;
+		lower_x 		= 0;
+	}
+	else
+	{
+		upper_x 		= 0;
+		half_x  		= NEG_QUARTER_MARK;
+		lower_x 		= MAX_NEG_POSITION;
+	}
+	result.child 		+= (body_x >= half_x) 1 : 0;
+
+	if(body_y >= 0)
+	{
+		result.parent 	+= 2;
+		upper_y 		= MAX_POS_POSITION;
+		half_y  		= POS_QUARTER_MARK;
+		lower_y 		= 0;
+	}
+	else
+	{
+		upper_y 		= 0;
+		half_y  		= NEG_QUARTER_MARK;
+		lower_y 		= MAX_NEG_POSITION;
+	}
+	result.child 		+= (body_y >= half_y) 2 : 0;
+
+	if(body_z >= 0)
+	{
+		result.parent 	+= 4;
+		upper_z 		= MAX_POS_POSITION;
+		half_z  		= POS_QUARTER_MARK;
+		lower_z 		= 0;
+	}
+	else
+	{
+		upper_z 		= 0;
+		half_z  		= NEG_QUARTER_MARK;
+		lower_z 		= MAX_NEG_POSITION;
+	}
+	result.child 		+= (body_z >= half_z) 4 : 0;
+
+	return result;
+}
+
+int octree_rebuild(p_octant root)
+{
+	int 			i, j, k, leaf_count, dest_parent, dest_child;
+	int 			check;
+	p_octant 		root_children = root->children;
+	p_octant 		source, dest;
+	octant_pair 	location_now;
+
+
+	for(i = 0; i < CHILD_COUNT; i++)
+	{
+		for(j = 0; j < CHILD_COUNT; j++)
+		{
+			source 	   = root_children[i]->children[j];
+			leaf_count = source->leaf_count;
+			for(k = 0; k < leaf_count; k++)
+			{
+				location_now = octant_locate(source->pos_x[k], source->pos_y[k], source->pos_z[k]);
+
+				if((location_now.parent != i) || (location_now.child != j))
+				{
+					dest  = root_children[location_now.parent]->children[location_now.child];
+					check = octant_move_leaf(source, dest, k);
+
+					if(KILL == check) return KILL;
+				}
+			}
+		}
+
 	}
 }
