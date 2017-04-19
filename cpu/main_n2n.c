@@ -1,4 +1,7 @@
-
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include "cpu_n2n.h"
 
 //  Time based defines
 #define TIME_STEP				3*TIME_DAY  //time step to be used for calculations
@@ -11,6 +14,8 @@
 
 #define EXIT_COUNT				200			//  number of iterations in loop
 #define FILENAME_LEN			256
+
+const data_t GRAV_CONST = 6.674e-11;
 
 ////////////////////////////////////////////////////////////////////
 //
@@ -33,20 +38,25 @@ int main(int argc, char *argv[])
 {
 	////////////////
 	//
-	//  data_t
-	//
-	////////////////
-
-	if(MAX_POS_POSITION == DATA_T_ERR)
-	{
-		printf("\nERROR: data_t not defined properly!\n");
-		return 0;
-	}
-
-	////////////////
-	//
 	//  PART 1
 	//
 	////////////////
+
+	char 		*filename = (char*) malloc(sizeof(char) * FILENAME_LEN);
+	int i, j, k;
+	int num_bodies = 0;
+
+	if(argc != 2)
+	{
+		printf("\nERROR: Command line requires file name input!\n");
+		return 0;
+	}
+
+	filename  = argv[1];
+	num_bodies = body_count(filename);
+	free(filename);  // we won't need it anymore
+
+	//  generate the arrays we need
+
 	return 0;
 }
