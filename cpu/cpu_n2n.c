@@ -67,9 +67,9 @@ void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, 
 	for(i = 0; i < len; i++)
 	{
 		// convert forces to acceleration, saves a multiply later
-		fma_x[i] /= mass;
-		fma_y[i] /= mass;
-		fma_z[i] /= mass;
+		fma_x[i] /= mass[i];
+		fma_y[i] /= mass[i];
+		fma_z[i] /= mass[i];
 
 		pos_x[i] += DISPLACE(vel_x[i], fma_x[i], time);
 		pos_y[i] += DISPLACE(vel_y[i], fma_y[i], time);
@@ -77,7 +77,7 @@ void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, 
 	}
 }
 
-void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len)
+void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len, int time)
 {
 
 }
