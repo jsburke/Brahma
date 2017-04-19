@@ -87,7 +87,30 @@ int main(int argc, char *argv[])
 	frc_y = (data_t*) malloc(sizeof(data_t) * num_bodies);
 	frc_z = (data_t*) malloc(sizeof(data_t) * num_bodies);
 
-	force_zero(frc_x, frc_y, frc_z, num_bodies);
+	if(!mass || !pos_x || !pos_y || !pos_z || !vel_x || !vel_y || !vel_z || !frc_x || !frc_y || !frc_z)
+	{
+		printf("ERROR: Array malloc issue!\n");
+		return 0;
+	}
+	////////////////
+	//
+	//  PART 2
+	//
+	////////////////
+
+	for(i = 0; i < EXIT_COUNT; i++)
+	{
+		force_zero(frc_x, frc_y, frc_z, num_bodies);
+
+		for(j = 0; j < num_bodies; j++)
+		{
+			for(k = j + 1; k < num_bodies; k++)
+				force_accum(mass, pos_x, pos_y, pos_z, frc_x, frc_y, frc_z, j, k);
+		}
+
+		position_update(mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z, frc_x, frc_y, frc_z);
+		velocity_update(mass, vel_x, vel_y, vel_z, frc_x, frc_y, frc_z);
+	}
 
 	return 0;
 }
