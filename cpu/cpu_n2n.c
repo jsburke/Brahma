@@ -62,6 +62,7 @@ void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data
 
 void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len, int time)
 {
+	//  NB, when this is invoked, fma arrays will have forces built up in force_accum()
 	int i;
 
 	for(i = 0; i < len; i++)
@@ -79,5 +80,13 @@ void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, 
 
 void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len, int time)
 {
+	// NB, when this is invoked, fma arrays should be accelerations set in position_update()
+	int i;
 
+	for(i = 0; i < len; i++)
+	{
+		vel_x[i] += fma_x[i] * time;
+		vel_y[i] += fma_y[i] * time;
+		vel_z[i] += fma_z[i] * time;
+	}
 }
