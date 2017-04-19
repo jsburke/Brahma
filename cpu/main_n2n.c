@@ -46,6 +46,21 @@ int main(int argc, char *argv[])
 	int i, j, k;
 	int num_bodies = 0;
 
+	// for doing the calculations over
+	data_t *mass;   //mass array
+
+	data_t *pos_x;  //position arrays
+	data_t *pos_y;
+	data_t *pos_z;
+
+	data_t *vel_x;	 //velocity arrays
+	data_t *vel_y;
+	data_t *vel_z;
+
+	data_t *frc_x;  //force arrays
+	data_t *frc_y;
+	data_t *frc_z;
+
 	if(argc != 2)
 	{
 		printf("ERROR: Command line requires file name input!\n");
@@ -58,6 +73,21 @@ int main(int argc, char *argv[])
 	printf("Num bodies: %d\n", num_bodies);
 
 	//  generate the arrays we need
+	mass  = (data_t*) malloc(sizeof(data_t) * num_bodies);
+
+	pos_x = (data_t*) malloc(sizeof(data_t) * num_bodies);
+	pos_y = (data_t*) malloc(sizeof(data_t) * num_bodies);
+	pos_z = (data_t*) malloc(sizeof(data_t) * num_bodies);
+
+	vel_x = (data_t*) malloc(sizeof(data_t) * num_bodies);
+	vel_y = (data_t*) malloc(sizeof(data_t) * num_bodies);
+	vel_z = (data_t*) malloc(sizeof(data_t) * num_bodies);
+
+	frc_x = (data_t*) malloc(sizeof(data_t) * num_bodies);
+	frc_y = (data_t*) malloc(sizeof(data_t) * num_bodies);
+	frc_z = (data_t*) malloc(sizeof(data_t) * num_bodies);
+
+	force_zero(frc_x, frc_y, frc_z, num_bodies);
 
 	return 0;
 }

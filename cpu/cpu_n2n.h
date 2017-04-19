@@ -14,6 +14,7 @@ typedef float data_t;
 // NB : expansion below is one MUL less than direct implementation
 #define DISPLACE(vel, accel, time) time * (vel + (0.5 * accel * time))
 
-int body_count(char* filename);  //const char* ???
+int 	body_count(char* filename);  //const char* ???
+void	force_zero(data_t* x, data_t* y, data_t* z, int len);
 
 #endif
