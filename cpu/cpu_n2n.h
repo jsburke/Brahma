@@ -3,6 +3,7 @@
 
 #include <math.h>
 #include <ctype.h>
+#include <stdlib.h>
 
 typedef float data_t;
 

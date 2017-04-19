@@ -48,13 +48,14 @@ int main(int argc, char *argv[])
 
 	if(argc != 2)
 	{
-		printf("\nERROR: Command line requires file name input!\n");
+		printf("ERROR: Command line requires file name input!\n");
 		return 0;
 	}
 
 	filename  = argv[1];
 	num_bodies = body_count(filename);
-	free(filename);  // we won't need it anymore
+	//free(filename);
+	printf("Num bodies: %d\n", num_bodies);
 
 	//  generate the arrays we need
 
