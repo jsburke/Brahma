@@ -111,6 +111,7 @@ int main(int argc, char *argv[])
 
 		position_update(mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z, fma_x, fma_y, fma_z, num_bodies, TIME_STEP);
 		velocity_update(mass, vel_x, vel_y, vel_z, fma_x, fma_y, fma_z, num_bodies, TIME_STEP);
+		//  if we get graphics in, update screen here
 	}
 
 	return 0;
