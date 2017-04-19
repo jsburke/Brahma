@@ -91,7 +91,11 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	//  Read file for data
+	if(!fileread_build_arrays(filename, mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z))
+	{
+		printf("ERROR: file read failed!\n");
+		return 0;
+	}
 
 	////////////////
 	//
