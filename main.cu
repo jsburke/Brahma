@@ -15,6 +15,9 @@
 
 #define SECS				TIME_STEP * 60		// seconds per time step
 #define G    				6.67408e-11;
+#define num_threads			16
+#define num_blocks			16
+
 typedef float data_t;
 
 
@@ -154,13 +157,21 @@ int main(int argc, char *argv[])
 	CUDA_SAFE_CALL(cudaMemcpy(d_fma_x, h_fma_x, allocSize, cudaMemcpyHostToDevice));
 	CUDA_SAFE_CALL(cudaMemcpy(d_fma_y, h_fma_y, allocSize, cudaMemcpyHostToDevice));
 	CUDA_SAFE_CALL(cudaMemcpy(d_fma_z, h_fma_z, allocSize, cudaMemcpyHostToDevice));
+
+
+	if(!h_mass || !h_pos_x || !h_pos_y || !h_pos_z || !h_vel_x || !h_vel_y || !h_vel_z || !h_fma_x || !h_fma_y || !h_fma_z)
+	{
+		printf("ERROR: Array malloc issue!\n");
+		return 0;
+	}
+
 	
 	if( KILL == nbody_enum(bodies, filename)) return 0;  // exit on failure
 	free(filename);  //  file will no longer be accessed
 
 	// Launch the kernel
-        dim3 dimBlock(16,16,1);
-	dim3 dimGrid(1,1,1);
+        dim3 dimBlock(num_threads,num_threads,1);
+	dim3 dimGrid(num_blocks,num_blocks,1);
 	kernel_calculate_forces<<<dimGrid, dimBlock>>>(d_bodies, d_result, num_bodies);	
 	
 	// Check for errors during launch
