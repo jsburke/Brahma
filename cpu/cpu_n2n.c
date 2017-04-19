@@ -1,6 +1,7 @@
 #include "cpu_n2n.h"
 
-const data_t GRAV_CONST = 6.674e-11;
+const 	data_t GRAV_CONST = 6.674e-11;
+#define LINE_LEN			512
 
 int		body_count(char* filename)
 {
@@ -89,4 +90,31 @@ void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, 
 		vel_y[i] += fma_y[i] * time;
 		vel_z[i] += fma_z[i] * time;
 	}
+}
+
+int 	fileread_build_arrays(char* filename, data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, int len)
+{
+	// returns true -- false
+	FILE *fp = fopen(filename, "r");
+
+	if(fp == NULL) return 0;
+
+	int i = 0;
+	char *buf = (char*) malloc(LINE_LEN);
+	int buf_len = 0;
+
+	while((i < len) && (fgets(buf, LINE_LEN - 1, fp) != NULL))
+	{
+		buf_len = strlen(buf);
+
+		if((buf_len > 0) && (buf[buf_len - 1] == '\n'))
+			buf[buf_len - 1] = '\0'; 
+
+		// extract here
+
+		i++;
+	}
+	free(buf);
+	fclose(fp);
+	return 1;
 }
