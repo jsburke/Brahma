@@ -17,9 +17,9 @@ typedef float data_t;
 int 	body_count(char* filename);  //const char* ???
 
 void	force_zero(data_t* x, data_t* y, data_t* z, int len);
-void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* frc_x, data_t* frc_y, data_t* frc_z, int focus, int comp);
+void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int focus, int comp);
 
-void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* frc_x, data_t* frc_y, data_t* frc_z, int len);
-void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* frc_x, data_t* frc_y, data_t* frc_z, int len);
+void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len);
+void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len);
 
 #endif

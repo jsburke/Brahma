@@ -31,7 +31,7 @@ void	force_zero(data_t* x, data_t* y, data_t* z, int len)
 	}
 }
 
-void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* frc_x, data_t* frc_y, data_t* frc_z, int focus, int comp)
+void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int focus, int comp)
 {
 	//  First the distance
 	data_t r_x, r_y, r_z, r;
@@ -48,24 +48,32 @@ void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data
 
 	F_part = FORCE_PARTIAL(GRAV_CONST, mass[focus], mass[comp], r);
 
-	frc_x[focus]  += F_part * r_x;
-	frc_y[focus]  += F_part * r_y;
-	frc_z[focus]  += F_part * r_z;
+	fma_x[focus]  += F_part * r_x;
+	fma_y[focus]  += F_part * r_y;
+	fma_z[focus]  += F_part * r_z;
 
 	// force for the comparison
 	// we know this by Newton's 3rd law
 
-	frc_x[comp]   += -frc_x[focus];
-	frc_y[comp]   += -frc_y[focus];
-	frc_z[comp]   += -frc_z[focus];
+	fma_x[comp]   += -fma_x[focus];
+	fma_y[comp]   += -fma_y[focus];
+	fma_z[comp]   += -fma_z[focus];
 }
 
-void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* frc_x, data_t* frc_y, data_t* frc_z, int len)
+void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len)
 {
+	int i;
 
+	for(i = 0; i < len; i++)
+	{
+		// convert forces to acceleration, saves a multiply later
+		fma_x[i] /= mass;
+		fma_y[i] /= mass;
+		fma_z[i] /= mass;
+	}
 }
 
-void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* frc_x, data_t* frc_y, data_t* frc_z, int len)
+void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len)
 {
 
 }

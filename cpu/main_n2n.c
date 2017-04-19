@@ -55,9 +55,9 @@ int main(int argc, char *argv[])
 	data_t *vel_y;
 	data_t *vel_z;
 
-	data_t *frc_x;  //force arrays
-	data_t *frc_y;
-	data_t *frc_z;
+	data_t *fma_x;  //force || acceleration arrays
+	data_t *fma_y;
+	data_t *fma_z;
 
 	if(argc != 2)
 	{
@@ -81,15 +81,18 @@ int main(int argc, char *argv[])
 	vel_y = (data_t*) malloc(sizeof(data_t) * num_bodies);
 	vel_z = (data_t*) malloc(sizeof(data_t) * num_bodies);
 
-	frc_x = (data_t*) malloc(sizeof(data_t) * num_bodies);
-	frc_y = (data_t*) malloc(sizeof(data_t) * num_bodies);
-	frc_z = (data_t*) malloc(sizeof(data_t) * num_bodies);
+	fma_x = (data_t*) malloc(sizeof(data_t) * num_bodies);
+	fma_y = (data_t*) malloc(sizeof(data_t) * num_bodies);
+	fma_z = (data_t*) malloc(sizeof(data_t) * num_bodies);
 
-	if(!mass || !pos_x || !pos_y || !pos_z || !vel_x || !vel_y || !vel_z || !frc_x || !frc_y || !frc_z)
+	if(!mass || !pos_x || !pos_y || !pos_z || !vel_x || !vel_y || !vel_z || !fma_x || !fma_y || !fma_z)
 	{
 		printf("ERROR: Array malloc issue!\n");
 		return 0;
 	}
+
+	//  Read file for data
+
 	////////////////
 	//
 	//  PART 2
@@ -98,16 +101,16 @@ int main(int argc, char *argv[])
 
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
-		force_zero(frc_x, frc_y, frc_z, num_bodies);
+		force_zero(fma_x, fma_y, fma_z, num_bodies);
 
 		for(j = 0; j < num_bodies; j++)
 		{
 			for(k = j + 1; k < num_bodies; k++)
-				force_accum(mass, pos_x, pos_y, pos_z, frc_x, frc_y, frc_z, j, k);
+				force_accum(mass, pos_x, pos_y, pos_z, fma_x, fma_y, fma_z, j, k);
 		}
 
-		position_update(mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z, frc_x, frc_y, frc_z, num_bodies);
-		velocity_update(mass, vel_x, vel_y, vel_z, frc_x, frc_y, frc_z, num_bodies);
+		position_update(mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z, fma_x, fma_y, fma_z, num_bodies);
+		velocity_update(mass, vel_x, vel_y, vel_z, fma_x, fma_y, fma_z, num_bodies);
 	}
 
 	return 0;
