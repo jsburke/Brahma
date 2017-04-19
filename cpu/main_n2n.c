@@ -15,8 +15,6 @@
 #define EXIT_COUNT				200			//  number of iterations in loop
 #define FILENAME_LEN			256
 
-const data_t GRAV_CONST = 6.674e-11;
-
 ////////////////////////////////////////////////////////////////////
 //
 // Inputs: a file name of the form galaxy_###.csv, where the number

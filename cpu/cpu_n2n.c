@@ -1,5 +1,7 @@
 #include "cpu_n2n.h"
 
+const data_t GRAV_CONST = 6.674e-11;
+
 int		body_count(char* filename)
 {
 	int count = 0;
@@ -44,7 +46,7 @@ void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data
 
 	data_t F_part;
 
-	F_part = FORCE_PARTIAL(mass[focus], mass[comp], r);
+	F_part = FORCE_PARTIAL(GRAV_CONST, mass[focus], mass[comp], r);
 
 	frc_x[focus]  += F_part * r_x;
 	frc_y[focus]  += F_part * r_y;
@@ -56,4 +58,14 @@ void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data
 	frc_x[comp]   += -frc_x[focus];
 	frc_y[comp]   += -frc_y[focus];
 	frc_z[comp]   += -frc_z[focus];
+}
+
+void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* frc_x, data_t* frc_y, data_t* frc_z, int len)
+{
+
+}
+
+void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* frc_x, data_t* frc_y, data_t* frc_z, int len)
+{
+
 }
