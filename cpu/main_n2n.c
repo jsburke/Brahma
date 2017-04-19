@@ -108,8 +108,8 @@ int main(int argc, char *argv[])
 				force_accum(mass, pos_x, pos_y, pos_z, frc_x, frc_y, frc_z, j, k);
 		}
 
-		position_update(mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z, frc_x, frc_y, frc_z);
-		velocity_update(mass, vel_x, vel_y, vel_z, frc_x, frc_y, frc_z);
+		position_update(mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z, frc_x, frc_y, frc_z, num_bodies);
+		velocity_update(mass, vel_x, vel_y, vel_z, frc_x, frc_y, frc_z, num_bodies);
 	}
 
 	return 0;
