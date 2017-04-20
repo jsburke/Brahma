@@ -117,7 +117,7 @@ def body_create(category, mass_min, mass_max, vel_min, vel_max):
 	x_vel = str(random.uniform(vel_min, vel_max))
 	y_vel = str(random.uniform(vel_min, vel_max))
 	z_vel = str(random.uniform(vel_min, vel_max))
-	return category + ", " + mass + ", " + x_pos + ", " + y_pos + ", " + z_pos + ", " + x_vel + ", " + y_vel + ", " + z_vel
+	return mass + ", " + x_pos + ", " + y_pos + ", " + z_pos + ", " + x_vel + ", " + y_vel + ", " + z_vel
 
 def bhole_create(outfile):
 	outfile.write(body_create("bhole", BHOLE_MASS_MIN, BHOLE_MASS_MAX, BHOLE_VELOCITY_MIN, BHOLE_VELOCITY_MAX) + "\n")
