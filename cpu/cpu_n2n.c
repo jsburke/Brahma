@@ -112,26 +112,25 @@ int 	fileread_build_arrays(char* filename, data_t* mass, data_t* pos_x, data_t* 
 			buf[buf_len - 1] = '\0'; 
 
 		// extract here
-		tmp 		= strtok(buf, ",");  // one to kill category that is unused
 		tmp 		= strtok(buf, ",");
 		mass[i] 	= STR_TO_DATA_T(tmp);
 
-		tmp 		= strtok(buf, ",");
+		tmp 		= strtok(NULL, ",");
 		pos_x[i] 	= STR_TO_DATA_T(tmp);
 
-		tmp 		= strtok(buf, ",");
+		tmp 		= strtok(NULL, ",");
 		pos_y[i] 	= STR_TO_DATA_T(tmp);
 
-		tmp 		= strtok(buf, ",");
+		tmp 		= strtok(NULL, ",");
 		pos_z[i] 	= STR_TO_DATA_T(tmp);
 
-		tmp 		= strtok(buf, ",");
+		tmp 		= strtok(NULL, ",");
 		vel_x[i] 	= STR_TO_DATA_T(tmp);
 
-		tmp 		= strtok(buf, ",");
+		tmp 		= strtok(NULL, ",");
 		vel_y[i] 	= STR_TO_DATA_T(tmp);
 
-		tmp 		= strtok(buf, ",");
+		tmp 		= strtok(NULL, ",");
 		vel_z[i] 	= STR_TO_DATA_T(tmp);
 
 		i++;
