@@ -119,6 +119,21 @@ int 	fileread_build_arrays(char* filename, data_t* mass, data_t* pos_x, data_t* 
 		tmp 		= strtok(buf, ",");
 		pos_x[i] 	= STR_TO_DATA_T(tmp);
 
+		tmp 		= strtok(buf, ",");
+		pos_y[i] 	= STR_TO_DATA_T(tmp);
+
+		tmp 		= strtok(buf, ",");
+		pos_z[i] 	= STR_TO_DATA_T(tmp);
+
+		tmp 		= strtok(buf, ",");
+		vel_x[i] 	= STR_TO_DATA_T(tmp);
+
+		tmp 		= strtok(buf, ",");
+		vel_y[i] 	= STR_TO_DATA_T(tmp);
+
+		tmp 		= strtok(buf, ",");
+		vel_z[i] 	= STR_TO_DATA_T(tmp);
+
 		i++;
 	}
 	free(buf);
