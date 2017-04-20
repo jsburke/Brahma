@@ -102,6 +102,7 @@ int 	fileread_build_arrays(char* filename, data_t* mass, data_t* pos_x, data_t* 
 	int i = 0;
 	char *buf = (char*) malloc(LINE_LEN);
 	int buf_len = 0;
+	char* tmp;
 
 	while((i < len) && (fgets(buf, LINE_LEN - 1, fp) != NULL))
 	{
@@ -111,6 +112,12 @@ int 	fileread_build_arrays(char* filename, data_t* mass, data_t* pos_x, data_t* 
 			buf[buf_len - 1] = '\0'; 
 
 		// extract here
+		tmp 		= strtok(buf, ",");  // one to kill category that is unused
+		tmp 		= strtok(buf, ",");
+		mass[i] 	= STR_TO_DATA_T(tmp);
+
+		tmp 		= strtok(buf, ",");
+		pos_x[i] 	= STR_TO_DATA_T(tmp);
 
 		i++;
 	}

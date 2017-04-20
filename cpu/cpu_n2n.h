@@ -8,12 +8,14 @@
 #include <string.h>
 
 typedef float data_t;
-#define DATA_T_FLOAT 1  //done for conditional compile, change if data_t is change
+#define DATA_T_FLOAT 1  //  done for conditional compile, change if data_t is change
 
-#ifdef DATA_T_FLOAT
+#ifdef DATA_T_FLOAT		//  conditional compiles for data_t resolutions
 	#define SQRT(x) sqrtf(x)
+	#define STR_TO_DATA_T(str) strtof(str, NULL)
 #elif  DATA_T_DOUBLE
 	#define SQRT(x) sqrt(x)
+	#define STR_TO_DATA_T(str) strtod(str, NULL)
 #endif
 
 
