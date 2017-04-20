@@ -52,8 +52,8 @@ EARTH_VELOCITY		= 30		# km/s
 # shrinking for 32 bit float usage
 MAX_POS_VAL			= 1.5e20
 MAX_NEG_POS_VAL		= -MAX_POS_VAL
-LOW_TOL				= 0.15		# tolerances so we don't start at screen edges
-HIGH_TOL			= 0.85
+TOL 				= 0.8		# tolerances so we don't start at screen edges
+
 
 #--------------------------------------------------------
 # Relative Body masses and velocities
@@ -104,7 +104,7 @@ MINOR_VELOCITY_MAX	= 21 * EARTH_VELOCITY
 #--------------------------------------------------------
 
 def pos_rand():
-	return random.uniform(LOW_TOL * MAX_POS_VAL, HIGH_TOL * MAX_POS_VAL) 
+	return random.uniform(TOL * MAX_NEG_POS_VAL, TOL * MAX_POS_VAL) 
 
 def vel_scale(v):
 	return math.sqrt(v)
@@ -117,7 +117,7 @@ def body_create(category, mass_min, mass_max, vel_min, vel_max):
 	x_vel = str(random.uniform(vel_min, vel_max))
 	y_vel = str(random.uniform(vel_min, vel_max))
 	z_vel = str(random.uniform(vel_min, vel_max))
-	return category + ", " + mass + ", " + x_pos + ", " + y_pos + ", " + z_pos + ", " + x_vel + ", " + y_vel + ", " + z_vel
+	return mass + ", " + x_pos + ", " + y_pos + ", " + z_pos + ", " + x_vel + ", " + y_vel + ", " + z_vel
 
 def bhole_create(outfile):
 	outfile.write(body_create("bhole", BHOLE_MASS_MIN, BHOLE_MASS_MAX, BHOLE_VELOCITY_MIN, BHOLE_VELOCITY_MAX) + "\n")
