@@ -18,7 +18,7 @@ cpu_n2n.o: cpu_n2n.c
 	$(CC) $(OPT) $(FLAGS) -c cpu_n2n.c
 
 octree: main_simple.c cpu_simple.o octree.o
-	$(CC) $(OPT) $(FLAGS) main_simple.c $(OCT_OBJS) -o $(OCT)
+	$(CC) $(OPT) $(FLAGS) main_simple.c $(OCT_OBJS) -o $(OCT) $(LINK)
 
 octree.o: octree.c
 	$(CC) $(OPT) $(FLAGS) -c octree.o
