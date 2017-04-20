@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
-typedef float data_t;
-#define DATA_T_FLOAT 1  //  done for conditional compile, change if data_t is change
+typedef double data_t;
+#define DATA_T_DOUBLE 1  //  done for conditional compile, change if data_t is change
 
 #ifdef DATA_T_FLOAT		//  conditional compiles for data_t resolutions
 	#define SQRT(x) sqrtf(x)
