@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 typedef float data_t;
 #define DATA_T_FLOAT 1  //done for conditional compile, change if data_t is change
