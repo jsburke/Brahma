@@ -104,7 +104,7 @@ MINOR_VELOCITY_MAX	= 21 * EARTH_VELOCITY
 #--------------------------------------------------------
 
 def pos_rand():
-	return random.uniform(LOW_TOL * MAX_POS_VAL, HIGH_TOL * MAX_POS_VAL) 
+	return random.uniform(LOW_TOL * MAX_NEG_POS_VAL, HIGH_TOL * MAX_POS_VAL) 
 
 def vel_scale(v):
 	return math.sqrt(v)
