@@ -24,7 +24,7 @@ int 	fileread_build_tree(char* filename, octant *root, int len)
 {
 	FILE *fp = fopen(filename, "r");
 
-	if(!fp) return NULL;
+	if(!fp) return 0;
 
 	//  file reading variables
 	int i = 0;
@@ -75,6 +75,8 @@ int 	fileread_build_tree(char* filename, octant *root, int len)
 		locus		= octant_locate(pos_x, pos_y, pos_z);
 		oct_major	= locus.parent;
 		oct_minor 	= locus.child;
+
+
 
 		i++;
 	}

@@ -144,7 +144,57 @@ void 		center_of_mass_update(octant* root)
 
 pair 		octant_locate(data_t x, data_t y, data_t z)
 {
+	data_t upper_x, lower_x, half_x, upper_y, lower_y, half_y, upper_z, lower_z, half_z;
 	pair locus;
+
+	// inits so that this works properly
+	locus.parent = 0;
+	locus.child  = 0;
+
+	if(x >= 0) 
+	{
+		locus.parent 	+= 1;
+		upper_x 		= POSITION_MAX_POS;
+		half_x  		= POS_QUARTER_MARK;
+		lower_x 		= 0;
+	}
+	else
+	{
+		upper_x 		= 0;
+		half_x  		= NEG_QUARTER_MARK;
+		lower_x 		= POSITION_MAX_NEG;
+	}
+	locus.child 		+= (x >= half_x) ? 1 : 0;
+
+	if(y >= 0)
+	{
+		locus.parent 	+= 2;
+		upper_y 		= POSITION_MAX_POS;
+		half_y  		= POS_QUARTER_MARK;
+		lower_y 		= 0;
+	}
+	else
+	{
+		upper_y 		= 0;
+		half_y  		= NEG_QUARTER_MARK;
+		lower_y 		= POSITION_MAX_NEG;
+	}
+	locus.child 		+= (y >= half_y) ? 2 : 0;
+
+	if(z >= 0)
+	{
+		locus.parent 	+= 4;
+		upper_z 		= POSITION_MAX_POS;
+		half_z  		= POS_QUARTER_MARK;
+		lower_z 		= 0;
+	}
+	else
+	{
+		upper_z 		= 0;
+		half_z  		= NEG_QUARTER_MARK;
+		lower_z 		= POSITION_MAX_NEG;
+	}
+	locus.child 		+= (z >= half_z) ? 4 : 0;
 
 	return locus;
 }
