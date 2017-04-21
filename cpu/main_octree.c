@@ -21,6 +21,7 @@
 //
 // Step 1:
 //			Get number of bodies from input file
+//			Generate Tree Skeleton
 //			Read file while populating suboctants
 // Step 2:
 //			Calculate centers of mass
@@ -54,7 +55,18 @@ int main(int argc, char *argv[])
 
 	filename   = argv[1];
 	num_bodies = body_count(filename);
-	printf("Number of bodies: %d\n", num_bodies);
+	//printf("Number of bodies: %d\n", num_bodies);
+
+	//  Generate the empty tree
+
+	octant *root 			 			 = octant_new(ROOT);
+
+	for(i = 0; i < CHILD_COUNT; i++)
+	{
+		root->children[i] 	= octant_new(LEVEL_1);
+		for(j = 0; j < CHILD_COUNT; j++)
+			root->children[i]->children[j] = octant_new(LEVEL_2);
+	}
 
 	return 0;
 }
