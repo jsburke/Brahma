@@ -20,11 +20,10 @@
 // Program Outline
 //
 // Step 1:
-//			Read the input file and generate an array of bodies
+//			Get number of bodies from input file
+//			Read file while populating suboctants
 // Step 2:
-//			Build tree from octant structs
-//			Populate the Level 2 nodes with leaves, AKA suns, moons, &c
-//			Calculate non-Root node mass attributes
+//			Calculate centers of mass
 // Step 3:
 //			!! MAIN PROGRAM LOOP HERE !!
 //			Check for rebuild of octree
