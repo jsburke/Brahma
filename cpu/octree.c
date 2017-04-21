@@ -201,5 +201,26 @@ pair 		octant_locate(data_t x, data_t y, data_t z)
 
 int 		octant_add_body(octant* root, int major, int minor, data_t mass, data_t pos_x, data_t pos_y, data_t pos_z, data_t vel_x, data_t vel_y, data_t vel_z)
 {
-	return 1;
+	octant* local 	= root->children[major]->children[minor];
+	int leaf_count 	= local->leaf_count;
+
+	if(leaf_count < AREA_CAPACITY)  // still safe
+	{
+		local->mass[leaf_count]		= mass;
+
+		local->pos_x[leaf_count] 	= pos_x;
+		local->pos_y[leaf_count] 	= pos_y;
+		local->pos_z[leaf_count] 	= pos_z;
+
+		local->vel_x[leaf_count] 	= vel_x;
+		local->vel_y[leaf_count] 	= vel_y;
+		local->vel_z[leaf_count] 	= vel_z;
+
+		local->leaf_count 			= leaf_count + 1;
+
+		return 1;
+
+		//  don't care about fma arrays since we zero them out at the start of every loop anyhow
+	}
+	else return 0;
 }
