@@ -31,7 +31,7 @@
 //			Check for rebuild of octree
 //				rebuild if constraints met
 //			Calculate centers of mass
-//			calculate accelerations
+//			calculate forces
 //			update position and velocity arrays in L2 octants
 //			zero out accelerations
 //
@@ -92,6 +92,8 @@ int main(int argc, char *argv[])
 		if((i % REBUILD_FREQ) == 0)
 			check = octree_rebuild(root);
 
+		force_zero(root);
+
 		if(!check)
 		{
 			printf("ERROR: Octree Rebuild caused error, iteration %d\n", i);
@@ -99,6 +101,10 @@ int main(int argc, char *argv[])
 		}
 
 		center_of_mass_update(root);
+		force_accum(root);
+		update_position(root);
+		update_velocity(root);
+
 	}
 
 	return 0;
