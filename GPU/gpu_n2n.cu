@@ -7,38 +7,56 @@
 #include <time.h>
 
 #define REBUILD_FREQ		5			// Rebuild after every X iterations
-#define TIME_STEP 			30  			// in simulation time, in minutes
-#define EXIT_COUNT			200 			// Number of iterations to do before exiting, -1 for infinite
+#define TIME_STEP 		30  			// in simulation time, in minutes
+#define EXIT_COUNT		200 			// Number of iterations to do before exiting, -1 for infinite
 #define FILENAME_LEN	 	256
-#define ERROR 				-1 			// Generic Error val for readability
+#define ERROR 			-1 			// Generic Error val for readability
 
-#define SECS				TIME_STEP * 60		// seconds per time step
-#define GRAV_CONST	  	  	6.67408e-11;
-#define NUM_THREADS			16
-#define NUM_BLOCKS			1
-#define LINE_LEN			512
+#define SECS			TIME_STEP * 60		// seconds per time step
+#define GRAV_CONST	  	6.67408e-11;
+#define NUM_THREADS		16
+#define NUM_BLOCKS		1
+#define LINE_LEN		512
 
 typedef float data_t;
+
+////////////////////////////////////////////Function prototyping////////////////////////////////////
+//__device__ void position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time);
+
+//__device__ void velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time);
+
+__device__ void position_update(data_t mass, data_t pos_x, data_t pos_y, data_t pos_z, data_t vel_x, data_t vel_y, data_t vel_z, data_t fma_x, data_t fma_y, data_t fma_z, int num_bodies, int time);
+
+__device__ void velocity_update(data_t mass, data_t vel_x, data_t vel_y, data_t vel_z, data_t fma_x, data_t fma_y, data_t fma_z, int num_bodies, int time);
+
+__global__ void kernel_force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time);
+
+void force_zero(data_t* x, data_t* y, data_t* z, int len);
+
+int fileread_build_arrays(char* filename, data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, int len);
 
 // Assertion to check for errors
 #define CUDA_SAFE_CALL(ans) { gpuAssert((ans), __FILE__, __LINE__); }
 inline void gpuAssert(cudaError_t code, char *file, int line, bool abort=true)
 {
-	if (code != cudaSuccess) force_zero(fma_x, fma_y, fma_z, num_bodies);
+	if (code != cudaSuccess) 
 	{
 		fprintf(stderr,"CUDA_SAFE_CALL: %s %s %d\n", cudaGetErrorString(code), file, line);
 		if (abort) exit(code);
 	}
 }
 
-int fileread_build_arrays(char* filename, data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, int len);
-
-__global__ void kernel_force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time)
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+__global__ void kernel_force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time)
 {
 	int idx = blockIdx.x * blockDim.x + threadIdx.x;
 	int i;
-	data_t* r_x, r_y, r_z, r;
-	data_t* F_part;
+	data_t* r_x; //r_y, r_z, r;
+	data_t* r_y;
+	data_t* r_z;
+	data_t* r;
+	data_t F_part;
 	
 	for(i = 0; i < num_bodies; i++){
 		//int idx = index * num_bodies + i;
@@ -47,18 +65,18 @@ __global__ void kernel_force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, d
 			r_y[idx] = pos_y[idx] - pos_y[i];
 			r_z[idx] = pos_z[idx] - pos_z[i];
 	
-			r[idx] = sqrt((r_x[idx] * r_x[idx]) + (r_y[idx] * r_y[idx]) + (r_z * r_z[idx]));
+			r[idx] = sqrt( (r_x[idx] * r_x[idx]) + (r_y[idx] * r_y[idx]) + (r_z[idx] * r_z[idx]) );
 
 			// force 
-			F_part[idx] = GRAV_CONST * (mass[idx] * mass[i])/(r[idx] * r[idx] *r[idx]);
+			F_part = 6.67408e-11 * (mass[idx] * mass[i])/(r[idx] * r[idx] *r[idx]);
 
-			fma_x[idx]  += F_part[idx] * r_x[idx];
-			fma_y[idx]  += F_part[idx] * r_y[idx];
-			fma_z[idx]  += F_part[idx] * r_z[idx];
+			fma_x[idx]  += F_part * r_x[idx];
+			fma_y[idx]  += F_part * r_y[idx];
+			fma_z[idx]  += F_part * r_z[idx];
 
-			fma_x[i]   += -fma_x[idx];
-			fma_y[i]   += -fma_y[idx];
-			fma_z[i]   += -fma_z[idx];
+			//fma_x[i]   += -fma_x[idx];
+			//fma_y[i]   += -fma_y[idx];
+			//fma_z[i]   += -fma_z[idx];
 			}
 		__syncthreads();
 	}
@@ -67,52 +85,55 @@ __global__ void kernel_force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, d
 	
 }
 
-__device__ void position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time)
+__device__ void position_update(data_t mass, data_t pos_x, data_t pos_y, data_t pos_z, data_t vel_x, data_t vel_y, data_t vel_z, data_t fma_x, data_t fma_y, data_t fma_z, int num_bodies, int time)
 {
 	//  NB, when this is invoked, fma arrays will have forces built up in force_accum()
-	int i;
+	//int i;
 	//int index = blockIdx.x * blockDim.x + threadIdx.x;
+	//int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-	for(i = 0; i < len; i++)
-	{
+	//for(i = 0; i < len; i++)
+	//{
 		//int idx = index * num_bodies + i;
 
 		// convert forces to acceleration, saves a multiply later
-		fma_x[idx] /= mass[idx];
-		fma_y[idx] /= mass[idx];
-		fma_z[idx] /= mass[idx];
+		fma_x /= mass;
+		fma_y /= mass;
+		fma_z /= mass;
 
-		pos_x[idx] += time * (vel_x[idx] + (0.5 * fma_x[idx] * time)); 
-		pos_y[idx] += time * (vel_y[idx] + (0.5 * fma_y[idx] * time)); 
-		pos_z[idx] += time * (vel_z[idx] + (0.5 * fma_z[idx] * time)); 
+		pos_x += time * (vel_x + (0.5 * fma_x * time)); 
+		pos_y += time * (vel_y + (0.5 * fma_y * time)); 
+		pos_z += time * (vel_z + (0.5 * fma_z * time)); 
 		__syncthreads();
-	}
+	//}
 }
 
-__device__ void velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time)
+__device__ void velocity_update(data_t mass, data_t vel_x, data_t vel_y, data_t vel_z, data_t fma_x, data_t fma_y, data_t fma_z, int num_bodies, int time)
 {
 	// NB, when this is invoked, fma arrays should be accelerations set in position_update()
-	int i;
-	int index = blockIdx.x * blockDim.x + threadIdx.x;
+	//int i;
+	//int index = blockIdx.x * blockDim.x + threadIdx.x;
+	//int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-	for(i = 0; i < num_bodies; i++)
-	{
-		int idx = index * num_bodies + i;
-		vel_x[idx] += fma_x[idx] * time;
-		vel_y[idx] += fma_y[idx] * time;
-		vel_z[idx] += fma_z[idx] * time;
-	}
+	//for(i = 0; i < num_bodies; i++)
+	//{
+		//int idx = index * num_bodies + i;
+		vel_x += fma_x * time;
+		vel_y += fma_y * time;
+		vel_z += fma_z * time;
+	//}
 }
 
 
 int main(int argc, char *argv[])
 {
 	// data_t check
-	if(MAX_POS_POSITION == DATA_T_ERR)
+	/*if(MAX_POS_POSITION == -1) //DATA_T_ERR not defined so changed it to final value of -1
 	{
 		printf("\nERROR: data_t not defined properly!\n");
 		return 0;
-	}
+	}*/ 
+	//Commenting the above code because MAX_POS_POSITION is defined in octree.h which we are not including *period*
 
 	//  grab and process the file from command line
 	char*		filename = (char*) malloc(sizeof(char) * FILENAME_LEN);
@@ -193,6 +214,7 @@ int main(int argc, char *argv[])
 	h_fma_x = (data_t*) malloc(allocSize);
 	h_fma_y = (data_t*) malloc(allocSize);
 	h_fma_z = (data_t*) malloc(allocSize);
+	//h_result = (data_t*) malloc(allocSize);
 
 	if(!h_mass || !h_pos_x || !h_pos_y || !h_pos_z || !h_vel_x || !h_vel_y || !h_vel_z || !h_fma_x || !h_fma_y || !h_fma_z)
 	{
@@ -204,22 +226,23 @@ int main(int argc, char *argv[])
 	fileread_build_arrays(filename, h_mass, h_pos_x, h_pos_y, h_pos_z, h_vel_x, h_vel_y, h_vel_z, num_bodies);
 
 	//accelerations
-	force_zero(fma_x, fma_y, fma_z, num_bodies); /////////////////// need to fix this ////////////////////////////
+	force_zero(h_fma_x, h_fma_y, h_fma_z, num_bodies); /////////////////// need to fix this ////////////////////////////
 
 	// Select GPU
         CUDA_SAFE_CALL(cudaSetDevice(0));
-	
+		
 	//Allocate memory on GPU
-	CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_mass, allocSize));	
-	CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_pos_x, allocSize));
-	CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_pos_y, allocSize));
-	CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_pos_z, allocSize));
-	CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_vel_x, allocSize));
-	CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_vel_y, allocSize));
-	CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_vel_z, allocSize));
-	CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_fma_x, allocSize));
-	CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_fma_y, allocSize));
-	CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_fma_z, allocSize));
+	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_mass, allocSize));	
+	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_pos_x, allocSize));
+	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_pos_y, allocSize));
+	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_pos_z, allocSize));
+	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_vel_x, allocSize));
+	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_vel_y, allocSize));
+	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_vel_z, allocSize));
+	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_fma_x, allocSize));
+	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_fma_y, allocSize));
+	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_fma_z, allocSize));
+	//CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_result, allocSize));
 
 	//Transfer the data to GPU memory
 	CUDA_SAFE_CALL(cudaMemcpy(d_mass, h_mass, allocSize, cudaMemcpyHostToDevice));
@@ -241,7 +264,7 @@ int main(int argc, char *argv[])
 	
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
-		kernel_force_accum<<<dimGrid, dimBlock>>>(mass, pos_x, pos_y, pos_z, fma_x, fma_y, fma_z,num_bodies,TIME_STEP);
+		kernel_force_accum<<<dimGrid, dimBlock>>>(d_mass, d_pos_x, d_pos_y, d_pos_z, d_vel_x, d_vel_y, d_vel_z, d_fma_x, d_fma_y, d_fma_z, num_bodies, TIME_STEP);
 	
 	}
 
@@ -249,7 +272,7 @@ int main(int argc, char *argv[])
 	CUDA_SAFE_CALL(cudaPeekAtLastError());
 	
 	// Transfer the results back to the host
-	CUDA_SAFE_CALL(cudaMemcpy(h_result, d_result, allocSize, cudaMemcpyDeviceToHost));
+	//CUDA_SAFE_CALL(cudaMemcpy(sult, d_result, allocSize, cudaMemcpyDeviceToHost));
 
 	// Free-up device and host memory
 	CUDA_SAFE_CALL(cudaFree(d_mass));
@@ -277,7 +300,7 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
-void	force_zero(data_t* x, data_t* y, data_t* z, int len)
+void force_zero(data_t* x, data_t* y, data_t* z, int len)
 {
 	int i;
 
@@ -299,6 +322,7 @@ int fileread_build_arrays(char* filename, data_t* mass, data_t* pos_x, data_t* p
 	int i = 0;
 	char *buf = (char*) malloc(LINE_LEN);
 	int buf_len = 0;
+	char *tmp;
 
 	while((i < len) && (fgets(buf, LINE_LEN - 1, fp) != NULL))
 	{
@@ -309,25 +333,25 @@ int fileread_build_arrays(char* filename, data_t* mass, data_t* pos_x, data_t* p
 
 	tmp = strtok(buf, ",");
         tmp = strtok(NULL, ",");
-        h_mass[i] = atof(tmp);
+        mass[i] = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        h_pos_x[i] = atof(tmp);
+        pos_x[i] = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        h_pos_y[i] = atof(tmp);
+        pos_y[i] = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        h_pos_z[i] = atof(tmp);
+        pos_z[i] = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        h_vel_x[i] = atof(tmp);
+        vel_x[i] = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        h_vel_y[i] = atof(tmp);
+        vel_y[i] = atof(tmp);
 
         tmp = strtok(NULL, ",");
-        h_vel_z[i] = atof(tmp);
+        vel_z[i] = atof(tmp);
 
 	i++;
 	}
