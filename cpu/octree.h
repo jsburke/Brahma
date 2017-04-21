@@ -2,6 +2,7 @@
 #define OCTREE_H
 
 #include <stdlib.h>
+#include <stdio.h>
 
 typedef double data_t;
 #define DATA_T_DOUBLE		1
@@ -13,6 +14,8 @@ typedef double data_t;
 #define ROOT 				0
 #define LEVEL_1				1
 #define LEVEL_2				2
+
+#define AREA_CAPACITY		10000
 
 //  octant struct and functions
 
@@ -41,9 +44,9 @@ typedef struct octant
 	data_t 	*vel_y;
 	data_t 	*vel_z;
 
-	data_t 	*acc_x;
-	data_t 	*acc_y;
-	data_t 	*acc_z;
+	data_t 	*fma_x;
+	data_t 	*fma_y;
+	data_t 	*fma_z;
 } octant;
 
 octant*		octant_new(int lvl);

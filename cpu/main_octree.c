@@ -59,12 +59,15 @@ int main(int argc, char *argv[])
 	//  Generate the empty tree
 
 	octant *root 			 			 = octant_new(ROOT);
+	if(!root) return 0;
 
 	for(i = 0; i < CHILD_COUNT; i++)
 	{
 		root->children[i] 	= octant_new(LEVEL_1);
+		if(!(root->children[i])) return 0;
+
 		for(j = 0; j < CHILD_COUNT; j++)
-			root->children[i]->children[j] = octant_new(LEVEL_2);
+			if(!(root->children[i]->children[j] = octant_new(LEVEL_2))) return 0;
 	}
 
 	if(!fileread_build_tree(filename, root, num_bodies))
