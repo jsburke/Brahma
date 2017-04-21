@@ -53,6 +53,9 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	filename   = argv[1];
+	num_bodies = body_count(filename);
+	printf("Number of bodies: %d\n", num_bodies);
 
 	return 0;
 }

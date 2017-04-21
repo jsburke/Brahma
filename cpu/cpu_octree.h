@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "octree.h"
 
 #ifdef DATA_T_FLOAT		//  conditional compiles for data_t resolutions
 	#define SQRT(x) sqrtf(x)
@@ -21,5 +22,7 @@
 
 // NB : expansion below is one MUL less than direct implementation
 #define DISPLACE(vel, accel, time) time * (vel + (0.5 * accel * time))
+
+int 	body_count(char* filename);
 
 #endif
