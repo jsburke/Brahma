@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include "cpu_octree.h"
 
 //  Time based defines
 #define TIME_STEP				3*TIME_DAY  //time step to be used for calculations
@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
 	if(argc != 2)
 	{
 		printf("ERROR: Command line requires file input!\n");
+		return 0;
 	}
 
 
