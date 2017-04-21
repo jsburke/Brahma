@@ -93,7 +93,10 @@ int 	fileread_build_tree(char* filename, octant *root, int len)
 
 void	force_zero(octant* root)
 {
+	int i, j;
 
+	for(i = 0; i < CHILD_COUNT; i++)
+		for(j = 0; j < CHILD_COUNT; )
 }
 
 void	force_accum(octant* root)
