@@ -141,3 +141,10 @@ void 		center_of_mass_update(octant* root)
 {
 	
 }
+
+pair 		octant_locate(data_t x, data_t y, data_t z)
+{
+	pair locus;
+
+	return locus;
+}
