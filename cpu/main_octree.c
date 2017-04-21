@@ -1,5 +1,8 @@
 #include "cpu_octree.h"
 
+//  Rebuild constraint
+#define REBUILD_FREQ			5
+
 //  Time based defines
 #define TIME_STEP				3*TIME_DAY  //time step to be used for calculations
 //  General use
@@ -25,9 +28,9 @@
 //			Read file while populating suboctants
 // Step 2:
 //			!! MAIN PROGRAM LOOP HERE !!
-//			Calculate centers of mass
 //			Check for rebuild of octree
 //				rebuild if constraints met
+//			Calculate centers of mass
 //			calculate accelerations
 //			update position and velocity arrays in L2 octants
 //			zero out accelerations
@@ -82,8 +85,19 @@ int main(int argc, char *argv[])
 	//
 	/////////////////
 
+	int check = 0;
+
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
+		if((i % REBUILD_FREQ) == 0)
+			check = octree_rebuild(root);
+
+		if(!check)
+		{
+			printf("ERROR: Octree Rebuild caused error, iteration %d\n", i);
+			return 0;
+		}
+
 		center_of_mass_update(root);
 	}
 

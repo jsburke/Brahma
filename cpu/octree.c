@@ -137,6 +137,16 @@ octant*		octant_new(int lvl)
 	return oct;
 }
 
+int			octree_rebuild(octant* root)
+{
+	return 1;
+}
+
+void		force_zero(octant* root)
+{
+	
+}
+
 void 		center_of_mass_update(octant* root)
 {
 	
