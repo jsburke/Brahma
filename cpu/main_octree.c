@@ -68,5 +68,11 @@ int main(int argc, char *argv[])
 			root->children[i]->children[j] = octant_new(LEVEL_2);
 	}
 
+	if(!fileread_build_tree(filename, root, num_bodies))
+	{
+		printf("ERROR:  Reading file failed!\n");
+		return 0;
+	}
+
 	return 0;
 }

@@ -24,5 +24,6 @@
 #define DISPLACE(vel, accel, time) time * (vel + (0.5 * accel * time))
 
 int 	body_count(char* filename);
+int 	fileread_build_tree(char* filename, octant *root, int len);
 
 #endif

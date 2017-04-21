@@ -19,3 +19,8 @@ int		body_count(char* filename)
 
 	return count;
 }
+
+int 	fileread_build_tree(char* filename, octant *root, int len)
+{
+	return 0;
+}
