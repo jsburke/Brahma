@@ -24,9 +24,8 @@
 //			Generate Tree Skeleton
 //			Read file while populating suboctants
 // Step 2:
-//			Calculate centers of mass
-// Step 3:
 //			!! MAIN PROGRAM LOOP HERE !!
+//			Calculate centers of mass
 //			Check for rebuild of octree
 //				rebuild if constraints met
 //			calculate accelerations
@@ -72,6 +71,17 @@ int main(int argc, char *argv[])
 	{
 		printf("ERROR:  Reading file failed!\n");
 		return 0;
+	}
+
+	/////////////////
+	//
+	//  PART 2
+	//
+	/////////////////
+
+	for(i = 0; i < EXIT_COUNT; i++)
+	{
+		center_of_mass_update(root);
 	}
 
 	return 0;

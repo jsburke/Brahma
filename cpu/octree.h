@@ -48,4 +48,6 @@ typedef struct octant
 
 octant*		octant_new(int lvl);
 
+void 		center_of_mass_update(octant* root);
+
 #endif
