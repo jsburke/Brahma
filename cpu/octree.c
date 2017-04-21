@@ -148,3 +148,8 @@ pair 		octant_locate(data_t x, data_t y, data_t z)
 
 	return locus;
 }
+
+int 		octant_add_body(octant* root, int major, int minor, data_t mass, data_t pos_x, data_t pos_y, data_t pos_z, data_t vel_x, data_t vel_y, data_t vel_z)
+{
+	return 1;
+}

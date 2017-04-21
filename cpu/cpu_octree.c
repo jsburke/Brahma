@@ -34,9 +34,11 @@ int 	fileread_build_tree(char* filename, octant *root, int len)
 
 	//  body variables to be placed into tree structure
 
-	data_t mass;
-	data_t pos_x, pos_y, pos_z;
-	data_t vel_x, vel_y, vel_z;
+	data_t 	mass;
+	data_t 	pos_x, pos_y, pos_z;
+	data_t 	vel_x, vel_y, vel_z;
+	pair 	locus;
+	int 	oct_major, oct_minor;
 
 	//  read and assign loop
 
@@ -68,6 +70,11 @@ int 	fileread_build_tree(char* filename, octant *root, int len)
 
 		tmp 		= strtok(NULL, ",");
 		vel_z	 	= STR_TO_DATA_T(tmp);
+
+		//  placement code
+		locus		= octant_locate(pos_x, pos_y, pos_z);
+		oct_major	= locus.parent;
+		oct_minor 	= locus.child;
 
 		i++;
 	}
