@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 	/////////////////
 
 	char 		*filename = (char*) malloc(sizeof(char) * FILENAME_LEN);
-	int i, j, k;
+	int i, j;
 	int num_bodies = 0;
 
 	if(argc != 2)
@@ -102,8 +102,8 @@ int main(int argc, char *argv[])
 
 		center_of_mass_update(root);
 		force_accum(root);
-		update_position(root);
-		update_velocity(root);
+		position_update(root);
+		velocity_update(root);
 
 	}
 
