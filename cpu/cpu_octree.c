@@ -76,13 +76,15 @@ int 	fileread_build_tree(char* filename, octant *root, int len)
 		oct_major	= locus.parent;
 		oct_minor 	= locus.child;
 
-
+		if(!octant_add_body(root, oct_major, oct_minor, mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z))
+		{
+			printf("ERROR: Filled octant(%d, %d) beyond capacity!\n", oct_major, oct_minor);
+			return 0;
+		}
 
 		i++;
 	}
 	free(buf);
 	fclose(fp);
-	return 1;
-
 	return 1;
 }
