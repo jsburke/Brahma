@@ -147,16 +147,55 @@ void 		center_of_mass_update(octant* root)
 	int 	i, j, k, leaf_count;
 	octant* local;
 
+	data_t mass_accum, x_accum, y_accum, z_accum;
+	data_t mass_accum_L1, x_accum_L1, y_accum_L1, z_accum_L1;
+
 	for(i = 0; i < CHILD_COUNT; i++)
 	{
+		mass_accum_L1   = 0;
+		x_accum_L1		= 0;
+		y_accum_L1		= 0;
+		z_accum_L1		= 0;
+
 		for(j = 0; j < CHILD_COUNT; j++)
 		{
 			local 		= root->children[i]->children[j];
 			leaf_count 	= local->leaf_count;
 
+			mass_accum  = 0;
+			x_accum		= 0;
+			y_accum		= 0;
+			z_accum		= 0;
+
 			for(k = 0; k < leaf_count; k++)
-				local = NULL;  // do the real math here
+			{
+				mass_accum	 += local->mass[k];
+				x_accum      += (oct->pos_x[i] * oct->mass[i]);
+				y_accum      += (oct->pos_y[i] * oct->mass[i]);
+				z_accum      += (oct->pos_z[i] * oct->mass[i]);
+			}
+
+			local->mass_total 	 = mass_accum;
+			local->mass_center_x = x_accum/mass_accum;
+			local->mass_center_y = y_accum/mass_accum;
+			local->mass_center_z = z_accum/mass_accum;
+
+			// do stuff for higher level while here
+			mass_accum_L1   += mass_accum;
+			x_accum_L1		+= local->mass_center_x;
+			y_accum_L1		+= local->mass_center_y;
+			z_accum_L1		+= local->mass_center_z;
+				
 		}
+
+		//Level 1 calculations
+
+		local = root->children[i];
+
+		local->mass_total 	 = mass_accum_L1;
+		local->mass_center_x = x_accum_L1/mass_accum_L1;
+		local->mass_center_y = y_accum_L1/mass_accum_L1;
+		local->mass_center_z = z_accum_L1/mass_accum_L1;
 	}
 
 }
