@@ -115,10 +115,15 @@ void 	body_body_force_accum(octant* oct, int focus, int comp)
 
 }
 
+void 	body_octant_force_accum(octant* local, int leaf, octant* distal)
+{
+
+}
+
 void	force_accum(octant* root)
 {
 	int 	i, j, k, m, leaf_count;
-	octant 	*local, *distal;
+	octant 	*local;
 
 	for(i = 0; i < CHILD_COUNT; i++)
 		for(j = 0; j < CHILD_COUNT; j++)
@@ -130,6 +135,12 @@ void	force_accum(octant* root)
 			{
 				for(m = k + 1; m < leaf_count; m++)
 					body_body_force_accum(local, k, m);
+
+				for(m = 0; m < CHILD_COUNT; m++)
+					if(m != j)body_octant_force_accum(local, k, root->children[i]->children[m]);
+
+				for(m = 0; m < CHILD_COUNT; m++)
+					if(m != i)body_octant_force_accum(local, k, root->children[m]);
 			}
 		}
 }
