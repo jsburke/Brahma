@@ -4,7 +4,7 @@
 #define REBUILD_FREQ			5
 
 //  Time based defines
-#define TIME_STEP				3*TIME_DAY  //time step to be used for calculations
+#define TIME_STEP				3*TIME_HOUR  //time step to be used for calculations
 //  General use
 #define TIME_MIN 				60			// lowest granualarity is second
 #define TIME_HOUR				60*TIME_MIN
@@ -73,11 +73,17 @@ int main(int argc, char *argv[])
 			if(!(root->children[i]->children[j] = octant_new(LEVEL_2))) return 0;
 	}
 
+	//  test variables, comment if not testing
+	octant *test  = root->children[4]->children[3];
+	int test_leaf = 0;
+
 	if(!fileread_build_tree(filename, root, num_bodies))
 	{
 		printf("ERROR:  Reading file failed!\n");
 		return 0;
 	}
+
+	//printf("Body %d in octant(4, 3) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", test_leaf, test->mass[test_leaf], test->pos_x[test_leaf], test->pos_y[test_leaf], test->pos_z[test_leaf]);
 
 	/////////////////
 	//
@@ -89,6 +95,7 @@ int main(int argc, char *argv[])
 
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
+		
 		if((i % REBUILD_FREQ) == 0)
 			check = octree_rebuild(root);
 
@@ -100,11 +107,12 @@ int main(int argc, char *argv[])
 
 		force_zero(root);
 
+		//printf("Body %d in octant(4, 3) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", test_leaf, test->mass[test_leaf], test->pos_x[test_leaf], test->pos_y[test_leaf], test->pos_z[test_leaf]);
+
 		center_of_mass_update(root);
 		force_accum(root);
-		position_update(root, TIME_STEP);
+		position_update(root, TIME_STEP);		
 		velocity_update(root, TIME_STEP);
-
 	}
 
 	return 0;
