@@ -76,7 +76,7 @@ int 	fileread_build_tree(char* filename, octant *root, int len)
 		oct_major	= locus.parent;
 		oct_minor 	= locus.child;
 
-		printf("Add body to octant(%d, %d) at position(%lf, %lf, %lf)\n", oct_major, oct_minor, pos_x, pos_y, pos_z);
+		//printf("Add body to octant(%d, %d) at position(%lf, %lf, %lf)\n", oct_major, oct_minor, pos_x, pos_y, pos_z);
 
 		if(!octant_add_body(root, oct_major, oct_minor, mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z))
 		{
@@ -126,14 +126,12 @@ void 	body_body_force_accum(octant* oct, int focus, int comp)
 
 	data_t F_x, F_y, F_z, F_part;
 
-	// data_t step_1, r_3;
-
-	// step_1 = GRAV_CONST * oct->mass[focus] * oct->mass[comp];
-	// r_3    = r * r * r;
-
 	F_part 	= FORCE_PARTIAL(GRAV_CONST, oct->mass[focus], oct->mass[comp], r);
 
-	//printf("F_part: %lf | step_1 %.2lf | r_3 %.2lf | inverse r_3 %lf\n", F_part, step_1, r_3, 1.0/r_3);
+	if(F_part > 0.0)
+		printf("F_part legit: %.15lf\n", F_part);
+	else
+		printf("F_part super small\n");
 
 	F_x 	= F_part * r_x;
 	F_y 	= F_part * r_y;
@@ -209,11 +207,8 @@ void	position_update(octant* root, int timestep)
 				local->fma_y[k]  /= mass;
 				local->fma_z[k]  /= mass;
 
-				//printf("(%d, %d): %d -- pos_x: %.2lf | vel_x: %.2lf | accel_x: %.2lf\n", i, j, k, local->pos_x[k], local->vel_x[k], local->fma_x[k]);
 				local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], timestep);
-				//printf("(%d, %d): %d -- pos_y: %.2lf | vel_y: %.2lf | accel_y: %.2lf\n", i, j, k, local->pos_y[k], local->vel_y[k], local->fma_y[k]);
 				local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], timestep);
-				//printf("(%d, %d): %d -- pos_z: %.2lf | vel_z: %.2lf | accel_z: %.2lf\n\n", i, j, k, local->pos_z[k], local->vel_z[k], local->fma_z[k]);
 				local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], timestep);
 			}
 		}

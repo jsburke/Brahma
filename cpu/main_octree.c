@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
-		
+		printf("iter: %d\n\n", i);
 		if((i % REBUILD_FREQ) == 0)
 			check = octree_rebuild(root);
 
