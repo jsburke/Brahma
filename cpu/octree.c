@@ -170,9 +170,9 @@ void 		center_of_mass_update(octant* root)
 			for(k = 0; k < leaf_count; k++)
 			{
 				mass_accum	 += local->mass[k];
-				x_accum      += (oct->pos_x[i] * oct->mass[i]);
-				y_accum      += (oct->pos_y[i] * oct->mass[i]);
-				z_accum      += (oct->pos_z[i] * oct->mass[i]);
+				x_accum      += (local->pos_x[i] * local->mass[i]);
+				y_accum      += (local->pos_y[i] * local->mass[i]);
+				z_accum      += (local->pos_z[i] * local->mass[i]);
 			}
 
 			local->mass_total 	 = mass_accum;
