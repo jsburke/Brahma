@@ -137,9 +137,33 @@ octant*		octant_new(int lvl)
 	return oct;
 }
 
-int			octree_rebuild(octant* root)
+int 		body_move(octant* src, octant* dst, int index)
 {
 	return 1;
+}
+
+int			octree_rebuild(octant* root)
+{
+		int 	oct_major, oct_minor, leaf, leaf_count, safe;
+		octant *local, *distal;
+		pair 	check;
+
+		for(oct_major = 0; oct_major < CHILD_COUNT; oct_major++)
+			for(oct_minor = 0; oct_minor < CHILD_COUNT; oct_minor++)
+			{
+				local 		= root->children[oct_major]->children[oct_minor];
+				leaf_count  = local->leaf_count;
+
+				for(leaf = 0; leaf < leaf_count; leaf++)
+				{
+					check = octant_locate(local->pos_x[leaf], local->pos_y[leaf], local->pos_z[leaf]);
+					if((check.parent != oct_major) || (check.child != oct_minor))
+					{
+						distal = root->children[check.parent]->children[check.child];
+						safe = body_move(local, distal, leaf);
+					}
+				}
+			}
 }
 
 void 		center_of_mass_update(octant* root)
