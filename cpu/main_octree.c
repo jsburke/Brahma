@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
 	}
 
 	//  test variables, comment if not testing
-	octant *test  = root->children[4]->children[3];
-	int test_leaf = 0;
+	// octant *test  = root->children[4]->children[3];
+	// int test_leaf = 0;
 
 	if(!fileread_build_tree(filename, root, num_bodies))
 	{

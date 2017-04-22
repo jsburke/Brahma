@@ -126,14 +126,14 @@ void 	body_body_force_accum(octant* oct, int focus, int comp)
 
 	data_t F_x, F_y, F_z, F_part;
 
-	data_t step_1, r_3;
+	// data_t step_1, r_3;
 
-	step_1 = GRAV_CONST * oct->mass[focus] * oct->mass[comp];
-	r_3    = r * r * r;
+	// step_1 = GRAV_CONST * oct->mass[focus] * oct->mass[comp];
+	// r_3    = r * r * r;
 
-	F_part 	= step_1 / r_3;
+	F_part 	= FORCE_PARTIAL(GRAV_CONST, oct->mass[focus], oct->mass[comp], r);
 
-	printf("F_part: %lf | step_1 %.2lf | r_3 %.2lf\n", F_part, step_1, r_3);
+	//printf("F_part: %lf | step_1 %.2lf | r_3 %.2lf | inverse r_3 %lf\n", F_part, step_1, r_3, 1.0/r_3);
 
 	F_x 	= F_part * r_x;
 	F_y 	= F_part * r_y;
