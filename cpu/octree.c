@@ -197,7 +197,6 @@ void 		center_of_mass_update(octant* root)
 		local->mass_center_y = y_accum_L1/mass_accum_L1;
 		local->mass_center_z = z_accum_L1/mass_accum_L1;
 	}
-
 }
 
 pair 		octant_locate(data_t x, data_t y, data_t z)

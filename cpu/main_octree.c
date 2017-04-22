@@ -92,13 +92,13 @@ int main(int argc, char *argv[])
 		if((i % REBUILD_FREQ) == 0)
 			check = octree_rebuild(root);
 
-		force_zero(root);
-
 		if(!check)
 		{
 			printf("ERROR: Octree Rebuild caused error, iteration %d\n", i);
 			return 0;
 		}
+
+		force_zero(root);
 
 		center_of_mass_update(root);
 		force_accum(root);
