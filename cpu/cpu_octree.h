@@ -28,7 +28,7 @@ int 	fileread_build_tree(char* filename, octant *root, int len);
 void	force_zero(octant* root);
 void	force_accum(octant* root);
 
-void	position_update(octant* root);
-void	velocity_update(octant* root);
+void	position_update(octant* root, int timestep);
+void	velocity_update(octant* root, int timestep);
 
 #endif

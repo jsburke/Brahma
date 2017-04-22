@@ -205,7 +205,7 @@ void	position_update(octant* root, int timestep)
 		}
 }
 
-void	velocity_update(octant* root)
+void	velocity_update(octant* root, int timestep)
 {
 
 }

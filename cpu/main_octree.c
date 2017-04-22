@@ -102,8 +102,8 @@ int main(int argc, char *argv[])
 
 		center_of_mass_update(root);
 		force_accum(root);
-		position_update(root);
-		velocity_update(root);
+		position_update(root, TIME_STEP);
+		velocity_update(root, TIME_STEP);
 
 	}
 
