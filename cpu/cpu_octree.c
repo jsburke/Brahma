@@ -179,9 +179,30 @@ void	force_accum(octant* root)
 		}
 }
 
-void	position_update(octant* root)
+void	position_update(octant* root, int timestep)
 {
+	int 		i, j, k;
+	octant* 	local;
+	data_t 		mass;
 
+	for(i = 0; i < CHILD_COUNT; i++)
+		for(j = 0; j < CHILD_COUNT; j++)
+		{
+			octant* local = root->children[i]->children[j];
+			leaf_count    = local->leaf_count;
+
+			for(k = 0; k < leaf_count; k++)
+			{
+				mass 			  = local->mass[k];
+				local->fma_x[k]  /= mass;
+				local->fma_y[k]  /= mass;
+				local->fma_z[k]  /= mass;
+
+				local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], timestep);
+				local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], timestep);
+				local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], timestep);
+			}
+		}
 }
 
 void	velocity_update(octant* root)
