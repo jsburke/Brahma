@@ -181,7 +181,7 @@ void	force_accum(octant* root)
 
 void	position_update(octant* root, int timestep)
 {
-	int 		i, j, k;
+	int 		i, j, k, leaf_count;
 	octant* 	local;
 	data_t 		mass;
 
