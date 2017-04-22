@@ -137,9 +137,56 @@ octant*		octant_new(int lvl)
 	return oct;
 }
 
-int 		body_move(octant* src, octant* dst, int index)
+int 		body_move(octant* src, octant* dst, int src_index)
 {
-	return 1;
+	int dst_index = dst->leaf_count;
+
+	if(dst_index == AREA_CAPACITY)
+	{
+		printf("\n\tERROR: Suboctant body capacity exceeded in octant_move_leaf()!\n");
+		printf("\tPLEASE rebuild with wider arrays in octant struct!\n");
+		return 0;
+	}
+	else
+	{
+
+		// first copy from source to dst
+		dst->mass[dst_index]  = src->mass[src_index];
+
+		dst->pos_x[dst_index] = src->pos_x[src_index];
+		dst->pos_y[dst_index] = src->pos_y[src_index];
+		dst->pos_z[dst_index] = src->pos_z[src_index];
+
+		dst->vel_x[dst_index] = src->vel_x[src_index];
+		dst->vel_y[dst_index] = src->vel_y[src_index];
+		dst->vel_z[dst_index] = src->vel_z[src_index];
+
+		// don't copy acceleration vectors, will zero out later
+
+		dst->leaf_count = dst_index + 1;  // note body addition
+
+		//move last leaf to index of moved leaf
+		//truncate array by decrementing leaf_count
+		int src_end = src->leaf_count;
+
+		src->mass[src_index]  = src->mass[src_end];
+
+		src->pos_x[src_index] = src->pos_x[src_end];
+		src->pos_y[src_index] = src->pos_y[src_end];
+		src->pos_z[src_index] = src->pos_z[src_end];
+
+		src->vel_x[src_index] = src->vel_x[src_end];
+		src->vel_y[src_index] = src->vel_y[src_end];
+		src->vel_z[src_index] = src->vel_z[src_end];
+		// not going to zero out src_end, just consider as garbage
+		// decremented leaf_count will handle it's access
+
+		// again, not copying acceleration vectors
+
+		src->leaf_count = src_end - 1;
+
+		return 1;
+	}
 }
 
 int			octree_rebuild(octant* root)
@@ -161,9 +208,13 @@ int			octree_rebuild(octant* root)
 					{
 						distal = root->children[check.parent]->children[check.child];
 						safe = body_move(local, distal, leaf);
+
+						if(!safe) return 0;
 					}
 				}
 			}
+
+		return 1;
 }
 
 void 		center_of_mass_update(octant* root)
