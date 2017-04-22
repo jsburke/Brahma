@@ -141,19 +141,18 @@ void 	body_octant_force_accum(octant* local, int leaf, octant* distal)
 {
 	data_t r_x, r_y, r_z, r;
 
-	r_x = local->pos_x[focus] - distal->mass_center_x[comp];
-	r_y = local->pos_y[focus] - distal->mass_center_y[comp];
-	r_z = local->pos_z[focus] - distal->mass_center_z[comp];
+	r_x = local->pos_x[leaf] - distal->mass_center_x;
+	r_y = local->pos_y[leaf] - distal->mass_center_y;
+	r_z = local->pos_z[leaf] - distal->mass_center_z;
 
 	r 	= DISTANCE(r_x, r_y, r_z);
 
-	F_part;
+	data_t F_part 	= FORCE_PARTIAL(GRAV_CONST, local->mass[leaf], distal->mass_total, r);
 
-	F_part 	= FORCE_PARTIAL(GRAV_CONST, local->mass[focus], distal->mass[comp], r);
-
-	local->fma_x[focus] += F_part * r_x;
-	local->fma_y[focus] += F_part * r_y;
-	local->fma_z[focus] += F_part * r_z;
+	local->fma_x[leaf] += F_part * r_x;
+	local->fma_y[leaf] += F_part * r_y;
+	local->fma_z[leaf] += F_part * r_z;
+}
 
 void	force_accum(octant* root)
 {
