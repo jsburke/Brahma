@@ -207,5 +207,20 @@ void	position_update(octant* root, int timestep)
 
 void	velocity_update(octant* root, int timestep)
 {
+	int 		i, j, k, leaf_count;
+	octant* 	local;
 
+	for(i = 0; i < CHILD_COUNT; i++)
+		for(j = 0; j < CHILD_COUNT; j++)
+		{
+			octant* local = root->children[i]->children[j];
+			leaf_count    = local->leaf_count;
+
+			for(k = 0; k < leaf_count; k++)
+			{
+				local->vel_x[k]	 += local->fma_x[k] * timestep;
+				local->vel_y[k]	 += local->fma_y[k] * timestep;
+				local->vel_z[k]	 += local->fma_z[k] * timestep;
+			}
+		}
 }
