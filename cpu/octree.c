@@ -144,7 +144,21 @@ int			octree_rebuild(octant* root)
 
 void 		center_of_mass_update(octant* root)
 {
-	
+	int 	i, j, k, leaf_count;
+	octant* local;
+
+	for(i = 0; i < CHILD_COUNT; i++)
+	{
+		for(j = 0; j < CHILD_COUNT; j++)
+		{
+			local 		= root->children[i]->children[j];
+			leaf_count 	= local->leaf_count;
+
+			for(k = 0; k < leaf_count; k++)
+				local = NULL;  // do the real math here
+		}
+	}
+
 }
 
 pair 		octant_locate(data_t x, data_t y, data_t z)
