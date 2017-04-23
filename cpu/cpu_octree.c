@@ -128,10 +128,10 @@ void 	body_body_force_accum(octant* oct, int focus, int comp)
 
 	F_part 	= FORCE_PARTIAL(GRAV_CONST, oct->mass[focus], oct->mass[comp], r);
 
-	if(F_part > 0.0)
-		printf("F_part legit: %.15lf\n", F_part);
-	else
-		printf("F_part super small\n");
+	// if(F_part > 0.0)
+	// 	printf("F_part legit: %.15lf\n", F_part);
+	// else
+	// 	printf("F_part super small\n");
 
 	F_x 	= F_part * r_x;
 	F_y 	= F_part * r_y;
@@ -153,6 +153,10 @@ void 	body_octant_force_accum(octant* local, int leaf, octant* distal)
 	r_x = local->pos_x[leaf] - distal->mass_center_x;
 	r_y = local->pos_y[leaf] - distal->mass_center_y;
 	r_z = local->pos_z[leaf] - distal->mass_center_z;
+
+	if((r_x != r_x) || (r_y != r_y) || (r_z != r_z)) return;
+
+	printf("(%.4lf, %.4lf, %.4lf)\n", r_x, r_y, r_z);
 
 	r 	= DISTANCE(r_x, r_y, r_z);
 
@@ -179,11 +183,17 @@ void	force_accum(octant* root)
 				for(m = k + 1; m < leaf_count; m++)
 					body_body_force_accum(local, k, m);
 
+				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);				
+
 				for(m = 0; m < CHILD_COUNT; m++)
 					if(m != j)body_octant_force_accum(local, k, root->children[i]->children[m]);
 
+				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);				
+
 				for(m = 0; m < CHILD_COUNT; m++)
 					if(m != i)body_octant_force_accum(local, k, root->children[m]);
+
+				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);
 			}
 		}
 }
@@ -202,14 +212,21 @@ void	position_update(octant* root, int timestep)
 
 			for(k = 0; k < leaf_count; k++)
 			{
+
+				//printf("(%d, %d, %d) has %.5lf kg is at (%.3lf, %.3lf, %.3lf)\n", i, j, k, local->mass[k], local->fma_x[k], local->fma_y[k], local->fma_z[k]);
+
 				mass 			  = local->mass[k];
 				local->fma_x[k]  /= mass;
 				local->fma_y[k]  /= mass;
 				local->fma_z[k]  /= mass;
 
+				//printf("(%d, %d, %d) has %.5lf kg is at (%.3lf, %.3lf, %.3lf)\n", i, j, k, local->mass[k], local->fma_x[k], local->fma_y[k], local->fma_z[k]);
+
 				local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], timestep);
 				local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], timestep);
 				local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], timestep);
+
+				//printf("(%d, %d, %d) is at (%.3lf, %.3lf, %.3lf)\n", i, j, k, local->pos_x[k], local->pos_y[k], local->pos_z[k]);
 			}
 		}
 }

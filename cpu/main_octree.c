@@ -74,8 +74,8 @@ int main(int argc, char *argv[])
 	}
 
 	//  test variables, comment if not testing
-	// octant *test  = root->children[4]->children[3];
-	// int test_leaf = 0;
+	 octant *test  = root->children[4]->children[3];
+	 int test_leaf = 0;
 
 	if(!fileread_build_tree(filename, root, num_bodies))
 	{
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
 		force_zero(root);
 
-		//printf("Body %d in octant(4, 3) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", test_leaf, test->mass[test_leaf], test->pos_x[test_leaf], test->pos_y[test_leaf], test->pos_z[test_leaf]);
+		printf("Body %d in octant(4, 3) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", test_leaf, test->mass[test_leaf], test->pos_x[test_leaf], test->pos_y[test_leaf], test->pos_z[test_leaf]);
 
 		center_of_mass_update(root);
 		force_accum(root);

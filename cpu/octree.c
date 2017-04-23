@@ -250,6 +250,8 @@ void 		center_of_mass_update(octant* root)
 				z_accum      += (local->pos_z[i] * local->mass[i]);
 			}
 
+			//printf("Center of mass (%d, %d) -- %.3lf kg (%.4lf, %.4lf, %.4lf)\n", i, j, mass_accum, x_accum, y_accum, z_accum);
+
 			local->mass_total 	 = mass_accum;
 			local->mass_center_x = x_accum/mass_accum;
 			local->mass_center_y = y_accum/mass_accum;
@@ -264,6 +266,8 @@ void 		center_of_mass_update(octant* root)
 		}
 
 		//Level 1 calculations
+
+		//printf("Center of mass (%d) -- %.3lf kg (%.4lf, %.4lf, %.4lf)\n", i, mass_accum_L1, x_accum_L1, y_accum_L1, z_accum_L1);
 
 		local = root->children[i];
 
