@@ -1,5 +1,5 @@
 CC = gcc
-OPT = -O1
+OPT = -O3
 FLAGS = -Wall
 LINK  = -lrt -lm
 
