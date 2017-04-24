@@ -15,6 +15,13 @@
 #define EXIT_COUNT				200			//  number of iterations in loop
 #define FILENAME_LEN			256
 
+#define TIMING_ACTIVE			1 			//  comment me out to disable timing in compile
+
+#ifdef	TIMING_ACTIVE
+	#include "timing.h"
+	#define TIMING_MODE				CLOCK_PROCESS_CPUTIME_ID  // change me for parallel
+#endif
+
 ////////////////////////////////////////////////////////////////////
 //
 // Inputs: a file name of the form galaxy_###.csv, where the number
@@ -43,6 +50,10 @@ int main(int argc, char *argv[])
 	char 		*filename = (char*) malloc(sizeof(char) * FILENAME_LEN);
 	int i, j, k;
 	int num_bodies = 0;
+
+	#ifdef TIMING_ACTIVE
+		struct timespec time_start, time_end, time_elapse;
+	#endif
 
 	// for doing the calculations over
 	data_t *mass;   //mass array
@@ -102,9 +113,14 @@ int main(int argc, char *argv[])
 	//
 	////////////////
 
+	#ifdef TIMING_ACTIVE
+		measure_cps();
+		clock_gettime(TIMING_MODE, &time_start);
+	#endif
+
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
-		printf("Position (x, y, z) of body 5: (%f, %f, %f)\n", pos_x[4], pos_y[4], pos_z[4]);
+		//printf("Position (x, y, z) of body 5: (%f, %f, %f)\n", pos_x[4], pos_y[4], pos_z[4]);
 		force_zero(fma_x, fma_y, fma_z, num_bodies);		
 
 		for(j = 0; j < num_bodies; j++)
@@ -117,6 +133,13 @@ int main(int argc, char *argv[])
 		velocity_update(mass, vel_x, vel_y, vel_z, fma_x, fma_y, fma_z, num_bodies, TIME_STEP);
 		//  if we get graphics in, update screen here
 	}
+
+	#ifdef TIMING_ACTIVE
+		clock_gettime(TIMING_MODE, &time_end);
+		time_elapse = ts_diff(time_start, time_end);
+		double ns = ((double) time_elapse.tv_sec) * 1.0e9 + ((double) time_elapse.tv_nsec);
+		printf("Time Elapsed was %lf ns.\n", ns);
+	#endif
 
 	return 0;
 }
