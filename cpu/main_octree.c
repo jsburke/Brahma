@@ -15,6 +15,13 @@
 #define EXIT_COUNT				200			//  number of iterations in loop
 #define FILENAME_LEN			256
 
+#define TIMING_ACTIVE			1 			//  comment me out to disable timing in compile
+
+#ifdef	TIMING_ACTIVE
+	#include "timing.h"
+	#define TIMING_MODE				CLOCK_PROCESS_CPUTIME_ID  // change me for parallel
+#endif
+
 ////////////////////////////////////////////////////////////////////
 //
 // Inputs: a file name of the form galaxy_###.csv, where the number
@@ -48,6 +55,10 @@ int main(int argc, char *argv[])
 	char 		*filename = (char*) malloc(sizeof(char) * FILENAME_LEN);
 	int i, j;
 	int num_bodies = 0;
+	
+	#ifdef TIMING_ACTIVE
+		struct timespec time_start, time_end, time_elapse;
+	#endif
 
 	if(argc != 2)
 	{
@@ -93,6 +104,11 @@ int main(int argc, char *argv[])
 
 	int check = 0;
 
+	#ifdef TIMING_ACTIVE
+		measure_cps();
+		clock_gettime(TIMING_MODE, &time_start);
+	#endif
+
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
 		//printf("iter: %d\n\n", i);
@@ -114,6 +130,13 @@ int main(int argc, char *argv[])
 		position_update(root, TIME_STEP);		
 		velocity_update(root, TIME_STEP);
 	}
+
+	#ifdef TIMING_ACTIVE
+		clock_gettime(TIMING_MODE, &time_end);
+		time_elapse = ts_diff(time_start, time_end);
+		double ns = ((double) time_elapse.tv_sec) * 1.0e9 + ((double) time_elapse.tv_nsec);
+		printf("Time Elapsed was %lf ns.\n", ns);
+	#endif
 
 	return 0;
 }
