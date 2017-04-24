@@ -45,6 +45,10 @@ print "N2N 1000:\n";
 system("$n2n galaxy_1000.csv");
 print "\n";
 
+print "N2N 2000:\n";
+system("$n2n galaxy_2000.csv");
+print "\n";
+
 print "N2N 7000:\n";
 system("$n2n galaxy_7000.csv");
 print "\n";
@@ -59,6 +63,10 @@ print "\n";
 
 print "OCTREE 1000:\n";
 system("$oct galaxy_1000.csv");
+print "\n";
+
+print "OCTREE 2000:\n";
+system("$oct galaxy_2000.csv");
 print "\n";
 
 print "OCTREE 7000:\n";
