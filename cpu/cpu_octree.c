@@ -99,6 +99,10 @@ void	force_zero(octant* root)
 {
 	int 		i, j, k, leaf_count;
 	octant*		local;
+	
+	#ifdef THREAD_ACTIVE
+		#pragma omp parallel for
+	#endif
 
 	for(i = 0; i < CHILD_COUNT; i++)
 		for(j = 0; j < CHILD_COUNT; j++)
@@ -156,7 +160,7 @@ void 	body_octant_force_accum(octant* local, int leaf, octant* distal)
 
 	if((r_x != r_x) || (r_y != r_y) || (r_z != r_z)) return;
 
-	printf("(%.4lf, %.4lf, %.4lf)\n", r_x, r_y, r_z);
+	//printf("(%.4lf, %.4lf, %.4lf)\n", r_x, r_y, r_z);
 
 	r 	= DISTANCE(r_x, r_y, r_z);
 
@@ -171,6 +175,10 @@ void	force_accum(octant* root)
 {
 	int 	i, j, k, m, leaf_count;
 	octant 	*local;
+
+	#ifdef THREAD_ACTIVE
+		#pragma omp parallel for
+	#endif
 
 	for(i = 0; i < CHILD_COUNT; i++)
 		for(j = 0; j < CHILD_COUNT; j++)
@@ -204,6 +212,10 @@ void	position_update(octant* root, int timestep)
 	octant* 	local;
 	data_t 		mass;
 
+	#ifdef THREAD_ACTIVE
+		#pragma omp parallel for
+	#endif
+
 	for(i = 0; i < CHILD_COUNT; i++)
 		for(j = 0; j < CHILD_COUNT; j++)
 		{
@@ -236,6 +248,10 @@ void	velocity_update(octant* root, int timestep)
 	int 		i, j, k, leaf_count;
 	octant* 	local;
 
+	#ifdef THREAD_ACTIVE
+		#pragma omp parallel for
+	#endif
+	
 	for(i = 0; i < CHILD_COUNT; i++)
 		for(j = 0; j < CHILD_COUNT; j++)
 		{

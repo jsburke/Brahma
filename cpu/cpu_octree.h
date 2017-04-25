@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <omp.h>
 #include "octree.h"
 
 #ifdef DATA_T_FLOAT		//  conditional compiles for data_t resolutions
@@ -13,6 +14,10 @@
 #elif  DATA_T_DOUBLE
 	#define SQRT(x) sqrt(x)
 	#define STR_TO_DATA_T(str) strtod(str, NULL)
+#endif
+
+#ifdef THREAD_ACTIVE
+	#define NUM_THREADS		32
 #endif
 
 //  Functions & Macros for the math that will be needed
