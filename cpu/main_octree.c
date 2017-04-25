@@ -1,8 +1,4 @@
-#ifdef THREAD_ACTIVE
-	#include "cpu_octree_omp.h"
-#else
-	#include "cpu_octree.h"
-#endif
+#include "cpu_octree.h"
 
 //  Rebuild constraint
 #define REBUILD_FREQ			5
