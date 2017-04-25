@@ -17,6 +17,8 @@
 #define NUM_THREADS		16
 #define NUM_BLOCKS		1
 #define LINE_LEN		512
+#define EXIT_COUNT		200			//  number of iterations in loop
+
 
 typedef float data_t;
 
@@ -125,6 +127,85 @@ __device__ void velocity_update(data_t mass, data_t vel_x, data_t vel_y, data_t 
 }
 
 
+void	force_zero(data_t* x, data_t* y, data_t* z, int len)
+{
+	int i;
+
+	for(i = 0; i < len; i++)
+	{
+		x[i] = 0;
+		y[i] = 0;
+		z[i] = 0;
+	}
+}
+
+void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int focus, int comp)
+{
+	//  First the distance
+	data_t r_x, r_y, r_z, r;
+
+	r_x = pos_x[focus] - pos_x[comp];
+	r_y = pos_y[focus] - pos_y[comp];
+	r_z = pos_z[focus] - pos_z[comp];
+
+	r = sqrt( (r_x * r_x) + (r_y * r_y) + (r_z * r_z) );
+
+	//  then the force for the focus
+
+	data_t F_part;
+
+	//F_part = FORCE_PARTIAL(GRAV_CONST, mass[focus], mass[comp], r);
+	F_part = 6.67408e-11 * (mass[focus] * mass[comp])/(r * r *r);
+
+	//printf("F_part %lf | m1 %.2lf kg | m2 %.2lf kg | r %.2lf km\n", F_part, mass[focus], mass[comp], r);
+
+	fma_x[focus]  += F_part * r_x;
+	fma_y[focus]  += F_part * r_y;
+	fma_z[focus]  += F_part * r_z;
+
+	// force for the comparison
+	// we know this by Newton's 3rd law
+
+	fma_x[comp]   += -fma_x[focus];
+	fma_y[comp]   += -fma_y[focus];
+	fma_z[comp]   += -fma_z[focus];
+}
+
+void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len, int time)
+{
+	//  NB, when this is invoked, fma arrays will have forces built up in force_accum()
+	int i;
+
+	for(i = 0; i < len; i++)
+	{
+		// convert forces to acceleration, saves a multiply later
+		fma_x[i] /= mass[i];
+		fma_y[i] /= mass[i];
+		fma_z[i] /= mass[i];
+
+		pos_x[i] += time * (vel_x[i] + (0.5 * fma_x[i] * time)); 
+		pos_y[i] += time * (vel_y[i] + (0.5 * fma_y[i] * time)); 
+		pos_z[i] += time * (vel_z[i] + (0.5 * fma_z[i] * time)); 
+		//pos_x[i] += DISPLACE(vel_x[i], fma_x[i], time);
+		//pos_y[i] += DISPLACE(vel_y[i], fma_y[i], time);
+		//pos_z[i] += DISPLACE(vel_z[i], fma_z[i], time);
+	}
+}
+
+void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len, int time)
+{
+	// NB, when this is invoked, fma arrays should be accelerations set in position_update()
+	int i;
+
+	for(i = 0; i < len; i++)
+	{
+		vel_x[i] += fma_x[i] * time;
+		vel_y[i] += fma_y[i] * time;
+		vel_z[i] += fma_z[i] * time;
+	}
+}
+
+
 int main(int argc, char *argv[])
 {
 	// data_t check
@@ -221,6 +302,8 @@ int main(int argc, char *argv[])
 		printf("ERROR: Array malloc issue!\n");
 		return 0;
 	}
+
+
 	
 	// read the file
 	fileread_build_arrays(filename, h_mass, h_pos_x, h_pos_y, h_pos_z, h_vel_x, h_vel_y, h_vel_z, num_bodies);
@@ -244,6 +327,12 @@ int main(int argc, char *argv[])
 	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_fma_z, allocSize));
 	//CUDA_SAFE_CALL(cudaMalloc((data_t*)&d_result, allocSize));
 
+	if(!d_mass || !d_pos_x || !d_pos_y || !d_pos_z || !d_vel_x || !d_vel_y || !d_vel_z || !d_fma_x || !d_fma_y || !d_fma_z)
+	{
+		printf("ERROR: Array malloc issue in GPU!\n");
+		return 0;
+	}
+
 	//Transfer the data to GPU memory
 	CUDA_SAFE_CALL(cudaMemcpy(d_mass, h_mass, allocSize, cudaMemcpyHostToDevice));
 	CUDA_SAFE_CALL(cudaMemcpy(d_pos_x, h_pos_x, allocSize, cudaMemcpyHostToDevice));
@@ -256,7 +345,7 @@ int main(int argc, char *argv[])
 	CUDA_SAFE_CALL(cudaMemcpy(d_fma_y, h_fma_y, allocSize, cudaMemcpyHostToDevice));
 	CUDA_SAFE_CALL(cudaMemcpy(d_fma_z, h_fma_z, allocSize, cudaMemcpyHostToDevice));
 	
-	free(filename);  //  file will no longer be accessed
+	//free(filename);  //  file will no longer be accessed
 
 	// Launch the kernel
     	dim3 dimBlock(NUM_THREADS, NUM_THREADS, 1);
@@ -271,11 +360,33 @@ int main(int argc, char *argv[])
 	// Check for errors during launch
 	CUDA_SAFE_CALL(cudaPeekAtLastError());
 	
-	// Transfer the results back to the host
-	//CUDA_SAFE_CALL(cudaMemcpy(sult, d_result, allocSize, cudaMemcpyDeviceToHost));
+///////////////////////////CPU turn////////////////////////////////////////////////
+	printf("CPU: 'My turn son!' \n");
+	printf("GPU: 'I am gonna come tomorrow then slow timer!' \n");
 
+	for(i = 0; i < EXIT_COUNT; i++)
+	{
+		//printf("Position (x, y, z) of body 5: (%f, %f, %f)\n", pos_x[4], pos_y[4], pos_z[4]);
+		force_zero(h_fma_x, h_fma_y, h_fma_z, num_bodies);		
+
+		for(j = 0; j < num_bodies; j++)
+		{
+			for(k = j + 1; k < num_bodies; k++)
+				force_accum(h_mass, h_pos_x, h_pos_y, h_pos_z, h_fma_x, h_fma_y, h_fma_z, j, k);
+		}
+
+		position_update(h_mass, h_pos_x, h_pos_y, h_pos_z, h_vel_x, h_vel_y, h_vel_z, h_fma_x, h_fma_y, h_fma_z, num_bodies, TIME_STEP);
+		velocity_update(h_mass, h_vel_x, h_vel_y, h_vel_z, h_fma_x, h_fma_y, h_fma_z, num_bodies, TIME_STEP);
+		//  if we get graphics in, update screen here
+	}
+
+
+
+
+
+	
 	// Free-up device and host memory
-	CUDA_SAFE_CALL(cudaFree(d_mass));
+	/*CUDA_SAFE_CALL(cudaFree(d_mass));
 	CUDA_SAFE_CALL(cudaFree(d_pos_x));
 	CUDA_SAFE_CALL(cudaFree(d_pos_y));
 	CUDA_SAFE_CALL(cudaFree(d_pos_z));
@@ -285,7 +396,7 @@ int main(int argc, char *argv[])
 	CUDA_SAFE_CALL(cudaFree(d_fma_x));
 	CUDA_SAFE_CALL(cudaFree(d_fma_y));
 	CUDA_SAFE_CALL(cudaFree(d_fma_z));
-
+*/
 	free(h_mass);
 	free(h_pos_x);
 	free(h_pos_y);
