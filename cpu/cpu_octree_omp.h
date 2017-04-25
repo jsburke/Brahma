@@ -16,8 +16,7 @@
 	#define STR_TO_DATA_T(str) strtod(str, NULL)
 #endif
 
-#define NUM_THREADS		8
-#define THREAD_ACTIVE	1
+#define NUM_THREADS		32
 
 //  Functions & Macros for the math that will be needed
 #define DISTANCE(r_x, r_y, r_z) SQRT((r_x * r_x) + (r_y * r_y) + (r_z * r_z))
