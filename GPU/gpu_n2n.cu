@@ -126,19 +126,6 @@ __device__ void velocity_update(data_t mass, data_t vel_x, data_t vel_y, data_t 
 	//}
 }
 
-
-void	force_zero(data_t* x, data_t* y, data_t* z, int len)
-{
-	int i;
-
-	for(i = 0; i < len; i++)
-	{
-		x[i] = 0;
-		y[i] = 0;
-		z[i] = 0;
-	}
-}
-
 void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int focus, int comp)
 {
 	//  First the distance
