@@ -32,8 +32,8 @@ octree.o: octree.c
 cpu_octree.o: octree.o cpu_octree.c
 	$(CC) $(OPT) $(FLAGS) octree.o -c cpu_octree.c
 
-cpu_octree_omp.o: octree.o cpu_octree_omp.c
-	$(CC) $(OPT) $(FLAGS) -fopenmp octree.o -c cpu_octree_omp.c	
+cpu_octree_omp.o: octree.o cpu_octree.c
+	$(CC) $(OPT) $(FLAGS) -fopenmp octree.o -c cpu_octree.c -o cpu_octree_omp.o -DTHREAD_ACTIVE
 
 timing.o: timing.c
 	$(CC) $(OPT) $(FLAGS) -c timing.c -lrt
