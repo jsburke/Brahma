@@ -1,4 +1,5 @@
-#include "cpu_octree.h"
+//#include "cpu_octree.h"
+#include "cpu_octree_omp.h"
 
 //  Rebuild constraint
 #define REBUILD_FREQ			5
@@ -15,11 +16,15 @@
 #define EXIT_COUNT				200			//  number of iterations in loop
 #define FILENAME_LEN			256
 
-#define TIMING_ACTIVE			1 			//  comment me out to disable timing in compile
+//#define TIMING_ACTIVE			1 			//  comment me out to disable timing in compile
 
 #ifdef	TIMING_ACTIVE
 	#include "timing.h"
-	#define TIMING_MODE				CLOCK_PROCESS_CPUTIME_ID  // change me for parallel
+	#ifndef	THREAD_ACTIVE
+		#define TIMING_MODE				CLOCK_REALTIME  // change me for parallel
+	#elif
+		#define TIMING_MODE				CLOCK_PROCESS_CPUTIME_ID
+	#endif
 #endif
 
 ////////////////////////////////////////////////////////////////////
@@ -85,14 +90,20 @@ int main(int argc, char *argv[])
 	}
 
 	//  test variables, comment if not testing
-	// octant *test  = root->children[4]->children[3];
-	// int test_leaf = 0;
+	octant *test  = root->children[4]->children[3];
+	int test_leaf = 0;
 
 	if(!fileread_build_tree(filename, root, num_bodies))
 	{
 		printf("ERROR:  Reading file failed!\n");
 		return 0;
 	}
+
+	#ifndef THREAD_ACTIVE
+		omp_set_dynamic(0);
+		omp_set_num_threads(NUM_THREADS);
+	#endif
+
 
 	//printf("Body %d in octant(4, 3) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", test_leaf, test->mass[test_leaf], test->pos_x[test_leaf], test->pos_y[test_leaf], test->pos_z[test_leaf]);
 
@@ -123,7 +134,7 @@ int main(int argc, char *argv[])
 
 		force_zero(root);
 
-		//printf("Body %d in octant(4, 3) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", test_leaf, test->mass[test_leaf], test->pos_x[test_leaf], test->pos_y[test_leaf], test->pos_z[test_leaf]);
+		printf("Body %d in octant(4, 3) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", test_leaf, test->mass[test_leaf], test->pos_x[test_leaf], test->pos_y[test_leaf], test->pos_z[test_leaf]);
 
 		center_of_mass_update(root);
 		force_accum(root);
