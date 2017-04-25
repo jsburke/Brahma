@@ -63,7 +63,7 @@ print "\n\n  BEGIN EXECUTION \n\n";
 
 # run a series of tests
 # harvest data
-print "N2N 105:\n";
+print "N2N 100:\n";
 system("$n2n galaxy_100.csv");
 print "\n";
 
@@ -83,7 +83,7 @@ print "N2N 7000:\n";
 system("$n2n galaxy_7000.csv");
 print "\n";
 
-print "OCTREE 105:\n";
+print "OCTREE 100:\n";
 system("$oct galaxy_100.csv");
 print "\n";
 
@@ -103,7 +103,7 @@ print "OCTREE 7000:\n";
 system("$oct galaxy_7000.csv");
 print "\n";
 
-print "OCTREE_OMP 105:\n";
+print "OCTREE_OMP 100:\n";
 system("$octomp galaxy_100.csv");
 print "\n";
 
