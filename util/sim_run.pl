@@ -4,6 +4,8 @@
 #
 # Copied from /Lab3/scripts/combineBuild and modified
 
+system("clear");
+
 $myname = "sim_run";
 
 $cwd = `pwd`; chomp $cwd;
@@ -21,6 +23,11 @@ if (-e $oct) {
   unlink($oct);
 }
 
+$octomp = "./OCTREE_OMP";
+if (-e $octomp) {
+  unlink($octomp);
+}
+
 print "building $n2n and $oct\n";
 system("make");
 if (!(-x $n2n)) {
@@ -30,6 +37,13 @@ if (!(-x $n2n)) {
 if (!(-x $oct)) {
   die "$myname: No binary $oct, compile error?\n";
 }
+
+if (!(-x $octomp)) {
+  die "$myname: No binary $octomp, compile error?\n";
+}
+
+# for spacing
+print "\n\n";
 
 # run a series of tests
 # harvest data
@@ -71,6 +85,26 @@ print "\n";
 
 print "OCTREE 7000:\n";
 system("$oct galaxy_7000.csv");
+print "\n";
+
+print "OCTREE_OMP 105:\n";
+system("$octomp galaxy_105.csv");
+print "\n";
+
+print "OCTREE_OMP 500:\n";
+system("$octomp galaxy_500.csv");
+print "\n";
+
+print "OCTREE_OMP 1000:\n";
+system("$octomp galaxy_1000.csv");
+print "\n";
+
+print "OCTREE_OMP 2000:\n";
+system("$octomp galaxy_2000.csv");
+print "\n";
+
+print "OCTREE_OMP 7000:\n";
+system("$octomp galaxy_7000.csv");
 print "\n";
 
 print "clean up\n";

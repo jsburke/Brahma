@@ -9,7 +9,7 @@ N2N_OBJS = cpu_n2n.o timing.o
 OCT = OCTREE_CPU
 OCT_OBJS = cpu_octree.o octree.o timing.o
 
-OCT_OMP = OCT_OMP
+OCT_OMP = OCTREE_OMP
 OCT_OMP_OBJS = cpu_octree_omp.o octree.o timing.o
 
 all: n2n octree octree_omp
