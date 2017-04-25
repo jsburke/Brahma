@@ -42,4 +42,4 @@ rebuild:
 	clean all
 
 clean:
-	rm *.o $(N2N) $(OCT)
+	rm *.o $(N2N) $(OCT) $(OCT_OMP)
