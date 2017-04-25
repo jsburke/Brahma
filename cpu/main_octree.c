@@ -19,7 +19,7 @@
 
 #ifdef	TIMING_ACTIVE
 	#include "timing.h"
-	#ifndef	THREAD_ACTIVE
+	#ifdef	THREAD_ACTIVE
 		#define TIMING_MODE				CLOCK_REALTIME  
 	#else	
 		#define TIMING_MODE				CLOCK_PROCESS_CPUTIME_ID

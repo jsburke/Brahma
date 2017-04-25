@@ -17,7 +17,7 @@
 #endif
 
 #ifdef THREAD_ACTIVE
-	#define NUM_THREADS		32
+	#define NUM_THREADS		8
 #endif
 
 //  Functions & Macros for the math that will be needed
