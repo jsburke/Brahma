@@ -12,7 +12,7 @@ OCT_OBJS = cpu_octree.o octree.o timing.o
 OCT_OMP = OCTREE_OMP
 OCT_OMP_OBJS = cpu_octree_omp.o octree.o timing.o
 
-TEST_PRINT    = on
+TEST_PRINT    = off
 TIMING_ACTIVE = on
 
 THREAD_DEFINES = -DTHREAD_ACTIVE
