@@ -5,7 +5,6 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
-#include <omp.h>
 #include "octree.h"
 
 #ifdef DATA_T_FLOAT		//  conditional compiles for data_t resolutions
@@ -17,6 +16,7 @@
 #endif
 
 #ifdef THREAD_ACTIVE
+	#include <omp.h>
 	#define NUM_THREADS		32
 #endif
 
