@@ -15,8 +15,7 @@
 #define EXIT_COUNT				200			//  number of iterations in loop
 #define FILENAME_LEN			256
 
-#define TIMING_ACTIVE			1 			//  comment me out to disable timing in compile
-#define TEST_PRINT				1 			//  comment me to disable priniting routines to see internal state
+//  following structures depend on defines passed in at compile time
 
 #ifdef TEST_PRINT
 	#define TEST_MAJOR			1			//  Major octant for test printing
