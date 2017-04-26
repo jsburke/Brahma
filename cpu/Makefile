@@ -54,8 +54,7 @@ cpu_octree_omp.o: octree.o cpu_octree.c
 timing.o: timing.c
 	$(CC) $(OPT) $(FLAGS) -c timing.c -lrt
 
-rebuild:
-	clean all
+rebuild: clean all
 
 clean:
 	rm *.o $(N2N) $(OCT) $(OCT_OMP)
