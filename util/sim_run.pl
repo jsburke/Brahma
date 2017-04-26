@@ -42,7 +42,7 @@ if (!(-x $octomp)) {
   die "$myname: No binary $octomp, compile error?\n";
 }
 
-print "Produce CSV files for execution";
+print "\nProduce CSV files for execution\n";
 # 100
 system("../util/bodyGen.py --star 5 --planet 25 --giant 10 --moon 30 --minor 30");
 
@@ -59,7 +59,7 @@ system("../util/bodyGen.py --star 300 --planet 400 --giant 300 --moon 200 --mino
 system("../util/bodyGen.py --star 400 --planet 1250 --giant 750 --moon 1600 --minor 3000");
 
 # for spacing
-print "\n\n  BEGIN EXECUTION \n\n";
+print "  BEGIN EXECUTION \n\n";
 
 # run a series of tests
 # harvest data

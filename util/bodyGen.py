@@ -207,9 +207,14 @@ def main():
 	minor 		= 0;
 
 	verbose_on	= 0;	# assume user doesn't want verbose output
+	quiet_on	= 0;	# if on, will shut off printing file names, might expand
+
 	if(options.verbose):
 		print("Verbose output enabled\n")
 		verbose_on = 1
+
+	if(options.quiet):
+		quiet_on   = 1 	# no print for option enabled because it's contradictory
 
 	# get number of each type
 
@@ -243,7 +248,7 @@ def main():
 	# produce ouput file
 
 	filename = "galaxy_" + str(total) + ".csv"
-	if(verbose_on): print("Output file: %r\n" % filename)
+	if(quiet_on == 0): print("Output file: %r\n" % filename)
 
 	outfile = open(filename, 'w')
 	outfile.truncate()
