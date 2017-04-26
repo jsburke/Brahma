@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
 		clock_gettime(TIMING_MODE, &time_end);
 		time_elapse = ts_diff(time_start, time_end);
 		double ns = ((double) time_elapse.tv_sec) * 1.0e9 + ((double) time_elapse.tv_nsec);
-		printf("Time Elapsed was %lf ns.\n", ns);
+		printf("Time Elapsed was %.0lf ns.\n", ns);
 	#endif
 
 	return 0;
