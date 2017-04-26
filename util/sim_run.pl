@@ -44,19 +44,22 @@ if (!(-x $octomp)) {
 
 print "\nProduce CSV files for execution\n";
 # 100
-system("../util/bodyGen.py --star 5 --planet 25 --giant 10 --moon 30 --minor 30");
+system("../util/bodyGen.py --total 100");
 
 # 500
-system("../util/bodyGen.py --star 50 --planet 250 --giant 50 --moon 50 --minor 100");
+system("../util/bodyGen.py --total 500");
 
 # 1000
-system("../util/bodyGen.py --star 150 --planet 300 --giant 350 --moon 100 --minor 100");
+system("../util/bodyGen.py --total 1000");
 
 # 2000
-system("../util/bodyGen.py --star 300 --planet 400 --giant 300 --moon 200 --minor 800");
+system("../util/bodyGen.py --total 2000");
 
-# 7000
-system("../util/bodyGen.py --star 400 --planet 1250 --giant 750 --moon 1600 --minor 3000");
+# 4000
+system("../util/bodyGen.py --total 4000");
+
+# 10000
+system("../util/bodyGen.py --total 10000");
 
 # for spacing
 print "  BEGIN EXECUTION \n\n";
@@ -79,8 +82,12 @@ print "N2N 2000:\n";
 system("$n2n galaxy_2000.csv");
 print "\n";
 
-print "N2N 7000:\n";
-system("$n2n galaxy_7000.csv");
+print "N2N 4000:\n";
+system("$n2n galaxy_4000.csv");
+print "\n";
+
+print "N2N 10000:\n";
+system("$n2n galaxy_10000.csv");
 print "\n";
 
 print "OCTREE 100:\n";
@@ -99,9 +106,14 @@ print "OCTREE 2000:\n";
 system("$oct galaxy_2000.csv");
 print "\n";
 
-print "OCTREE 7000:\n";
-system("$oct galaxy_7000.csv");
+print "OCTREE 4000:\n";
+system("$oct galaxy_4000.csv");
 print "\n";
+
+print "OCTREE 10000:\n";
+system("$oct galaxy_10000.csv");
+print "\n";
+
 
 print "OCTREE_OMP 100:\n";
 system("$octomp galaxy_100.csv");
@@ -119,9 +131,14 @@ print "OCTREE_OMP 2000:\n";
 system("$octomp galaxy_2000.csv");
 print "\n";
 
-print "OCTREE_OMP 7000:\n";
-system("$octomp galaxy_7000.csv");
+print "OCTREE_OMP 4000:\n";
+system("$octomp galaxy_4000.csv");
 print "\n";
+
+print "OCTREE_OMP 10000:\n";
+system("$octomp galaxy_10000.csv");
+print "\n";
+
 
 print "clean up\n";
 system("rm *.csv");
