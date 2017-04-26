@@ -84,9 +84,9 @@ int 	fileread_build_tree(char* filename, octant *root, int len)
 			return 0;
 		}
 
-		// octant *local = root->children[oct_major]->children[oct_minor];
-		// int    leaf = local->leaf_count - 1;
-		// printf("Body %d in (%d, %d) with mass %.2lf kg was added at (%.2lf, %.2lf, %.2lf)\n", i, oct_major, oct_minor, local->mass[leaf], local->pos_x[leaf], local->pos_y[leaf], local->pos_z[leaf]);
+		//octant *local = root->children[oct_major]->children[oct_minor];
+		//int    leaf = local->leaf_count - 1;
+		//printf("Body %d in (%d, %d) with mass %.2lf kg was added at (%.2lf, %.2lf, %.2lf)\n", i, oct_major, oct_minor, local->mass[leaf], local->pos_x[leaf], local->pos_y[leaf], local->pos_z[leaf]);
 
 		i++;
 	}
