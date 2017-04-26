@@ -16,6 +16,13 @@
 #define FILENAME_LEN			256
 
 #define TIMING_ACTIVE			1 			//  comment me out to disable timing in compile
+#define TEST_PRINT				1 			//  comment me to disable priniting routines to see internal state
+
+#ifdef TEST_PRINT
+	#define TEST_MAJOR			1			//  Major octant for test printing
+	#define TEST_MINOR			6 			//	Minor octant (suboctant) for prints
+	#define TEST_LEAF 			0 			//  Leaf to test print
+#endif
 
 #ifdef	TIMING_ACTIVE
 	#include "timing.h"
@@ -89,8 +96,9 @@ int main(int argc, char *argv[])
 	}
 
 	//  test variables, comment if not testing
-	//  octant *test  = root->children[4]->children[3];
-	//  int test_leaf = 0;
+	#ifdef TEST_PRINT
+	  octant *test  = root->children[TEST_MAJOR]->children[TEST_MINOR];
+	#endif
 
 	if(!fileread_build_tree(filename, root, num_bodies))
 	{
@@ -133,7 +141,9 @@ int main(int argc, char *argv[])
 
 		force_zero(root);
 
-		//printf("Body %d in octant(4, 3) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", test_leaf, test->mass[test_leaf], test->pos_x[test_leaf], test->pos_y[test_leaf], test->pos_z[test_leaf]);
+		#ifdef TEST_PRINT
+			printf("Body %d in octant(%d, %d) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", TEST_LEAF, TEST_MAJOR, TEST_MINOR, test->mass[TEST_LEAF], test->pos_x[TEST_LEAF], test->pos_y[TEST_LEAF], test->pos_z[TEST_LEAF]);
+		#endif
 
 		center_of_mass_update(root);
 		force_accum(root);
