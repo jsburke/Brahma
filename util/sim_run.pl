@@ -28,7 +28,7 @@ if (-e $octomp) {
   unlink($octomp);
 }
 
-print "building $n2n and $oct\n";
+print "building $n2n, $oct, and $octomp\n";
 system("make");
 if (!(-x $n2n)) {
   die "$myname: No binary $n2n, compile error?\n";
