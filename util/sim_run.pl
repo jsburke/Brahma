@@ -61,6 +61,9 @@ system("../util/bodyGen.py --total 4000");
 # 10000
 system("../util/bodyGen.py --total 10000");
 
+# 25000
+system("../util/bodyGen.py --total 25000");
+
 # for spacing
 print "  BEGIN EXECUTION \n\n";
 
@@ -90,6 +93,10 @@ print "N2N 10000:\n";
 system("$n2n galaxy_10000.csv");
 print "\n";
 
+print "N2N 25000\n";
+system("$n2n galaxy_25000.csv");
+print "\n";
+
 print "OCTREE 100:\n";
 system("$oct galaxy_100.csv");
 print "\n";
@@ -114,6 +121,9 @@ print "OCTREE 10000:\n";
 system("$oct galaxy_10000.csv");
 print "\n";
 
+print "OCTREE 25000\n";
+system("$oct galaxy_25000.csv");
+print "\n";
 
 print "OCTREE_OMP 100:\n";
 system("$octomp galaxy_100.csv");
@@ -139,6 +149,9 @@ print "OCTREE_OMP 10000:\n";
 system("$octomp galaxy_10000.csv");
 print "\n";
 
+print "OCTREE_OMP 25000\n";
+system("$octomp galaxy_25000.csv");
+print "\n";
 
 print "clean up\n";
 system("rm *.csv");
