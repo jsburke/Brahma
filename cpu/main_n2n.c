@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 	int num_bodies = 0;
 
 	#ifdef TIMING_ACTIVE
-		struct timespec time_start, time_end, time_elapse;
+		struct timespec total_start, total_end, total_elapse;
 	#endif
 
 	// for doing the calculations over
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
 
 	#ifdef TIMING_ACTIVE
 		measure_cps();
-		clock_gettime(TIMING_MODE, &time_start);
+		clock_gettime(TIMING_MODE, &total_start);
 	#endif
 
 	for(i = 0; i < EXIT_COUNT; i++)
@@ -135,9 +135,9 @@ int main(int argc, char *argv[])
 	}
 
 	#ifdef TIMING_ACTIVE
-		clock_gettime(TIMING_MODE, &time_end);
-		time_elapse = ts_diff(time_start, time_end);
-		double ns = ((double) time_elapse.tv_sec) * 1.0e9 + ((double) time_elapse.tv_nsec);
+		clock_gettime(TIMING_MODE, &total_end);
+		total_elapse = ts_diff(total_start, total_end);
+		double ns = ((double) total_elapse.tv_sec) * 1.0e9 + ((double) total_elapse.tv_nsec);
 		printf("Time Elapsed was %.0lf ns.\n", ns);
 	#endif
 
