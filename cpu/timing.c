@@ -68,7 +68,7 @@ double measure_cps()
   total_time = ts_sec(ts_diff(cal_start, cal_end));
   total_cycles = (double)(tsc_end.int64-tsc_start.int64);
   CPS = total_cycles / total_time;
-  printf("z == %f, CPS == %g\n", z, CPS);
+  //printf("z == %f, CPS == %g\n", z, CPS);
 
   return CPS;
 }
