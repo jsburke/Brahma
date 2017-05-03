@@ -15,8 +15,6 @@ typedef union {
                      "=a" ((cpu_c).int32.lo), "=d"((cpu_c).int32.hi))
 
 int    clock_gettime(clockid_t clk_id, struct timespec *tp);
-struct timespec diff(struct timespec start, struct timespec end);
-double ts_sec(struct timespec ts);
 struct timespec ts_diff(struct timespec start, struct timespec end);
 double measure_cps(void);
 
