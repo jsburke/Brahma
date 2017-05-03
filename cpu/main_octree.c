@@ -68,6 +68,10 @@ int main(int argc, char *argv[])
 	
 	#ifdef TIMING_ACTIVE
 		struct timespec total_start, total_end, total_elapse;
+		#ifdef CPE_ACTIVE
+			struct timespec iter_start[EXIT_COUNT], iter_end[EXIT_COUNT];
+			double 			iter_avg;
+		#endif
 	#endif
 
 	if(argc != 2)
@@ -128,6 +132,12 @@ int main(int argc, char *argv[])
 
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
+		#ifdef TIMING_ACTIVE
+			#ifdef CPE_ACTIVE
+				clock_gettime(TIMING_MODE, &iter_start[i]);
+			#endif
+		#endif
+
 		//printf("iter: %d\n\n", i);
 		if((i % REBUILD_FREQ) == 0)
 			check = octree_rebuild(root);
@@ -148,6 +158,12 @@ int main(int argc, char *argv[])
 		force_accum(root);
 		position_update(root, TIME_STEP);		
 		velocity_update(root, TIME_STEP);
+
+		#ifdef TIMING_ACTIVE
+			#ifdef CPE_ACTIVE
+				clock_gettime(TIMING_MODE, &iter_end[i]);
+			#endif
+		#endif
 	}
 
 	#ifdef TIMING_ACTIVE
@@ -155,6 +171,15 @@ int main(int argc, char *argv[])
 		total_elapse = ts_diff(total_start, total_end);
 		double ns = ((double) total_elapse.tv_sec) * 1.0e9 + ((double) total_elapse.tv_nsec);
 		printf("Time Elapsed was %.0lf ns.\n", ns);
+
+		#ifdef CPE_ACTIVE
+			iter_avg = 0;
+			for(i = 0; i < EXIT_COUNT; i++)
+				iter_avg += double_diff(iter_start[i], iter_end[i]);  //saturation issues?
+			
+			iter_avg /= EXIT_COUNT;
+			printf("Average time per iteration: %.0lf ns\n", iter_avg);
+		#endif
 	#endif
 
 	return 0;
