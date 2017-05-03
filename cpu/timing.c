@@ -1,7 +1,7 @@
 #include "timing.h"
 
 double CPS     = 2.9e9; // Cycles per second  -  adjust in measure_cps()
-double s_to_ns = 1.0e9; // Convert seconds to ns
+double s_to_ns = 1.0e-9; // Convert seconds to ns
 
 double ts_sec(struct timespec ts)
 {
