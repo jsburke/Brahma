@@ -15,6 +15,7 @@ OCT_OMP_OBJS = cpu_octree_omp.o octree.o timing.o
 TEST_PRINT    = off
 TIMING_ACTIVE = on
 CPE_ACTIVE    = on
+CSV_ACTIVE	  = on
 
 THREAD_DEFINES = -DTHREAD_ACTIVE
 
@@ -31,6 +32,11 @@ endif
 ifeq ($(CPE_ACTIVE), on)
 	THREAD_DEFINES += -DCPE_ACTIVE
 	SERIAL_DEFINES += -DCPE_ACTIVE
+endif
+
+ifeq ($(CSV_ACTIVE), on)
+	THREAD_DEFINES += -DCSV_ACTIVE
+	SERIAL_DEFINES += -DCSV_ACTIVE
 endif
 
 

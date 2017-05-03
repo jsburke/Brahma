@@ -22,6 +22,10 @@
 	#define TIMING_MODE				CLOCK_PROCESS_CPUTIME_ID  // change me for parallel
 #endif
 
+#ifdef  CSV_ACTIVE
+	#define TARGET_FILE ((const char*) "results.csv")
+#endif
+
 ////////////////////////////////////////////////////////////////////
 //
 // Inputs: a file name of the form galaxy_###.csv, where the number
@@ -122,6 +126,10 @@ int main(int argc, char *argv[])
 		clock_gettime(TIMING_MODE, &total_start);
 	#endif
 
+	#ifdef CSV_ACTIVE
+		FILE *pTarget = fopen(TARGET_FILE, "a");
+	#endif
+
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
 		#ifdef TIMING_ACTIVE
@@ -154,16 +162,28 @@ int main(int argc, char *argv[])
 		clock_gettime(TIMING_MODE, &total_end);
 		total_elapse = ts_diff(total_start, total_end);
 		double ns = ((double) total_elapse.tv_sec) * 1.0e9 + ((double) total_elapse.tv_nsec);
-		printf("Time Elapsed was %.0lf ns.\n", ns);
 
 		#ifdef CPE_ACTIVE
 			iter_avg = 0;
 			for(i = 0; i < EXIT_COUNT; i++)
 				iter_avg += double_diff(iter_start[i], iter_end[i]);  //saturation issues?
-			
 			iter_avg /= EXIT_COUNT;
-			printf("CPE: %.0lf cycles\n", CPE_calculate(iter_avg, num_bodies));
+
+			#ifdef CSV_ACTIVE
+				fprintf(pTarget, "%.0lf, ", CPE_calculate(iter_avg, num_bodies));
+			#else
+				printf("CPE : %.0lf cycles\n", CPE_calculate(iter_avg, num_bodies));
+			#endif
+				
+		#elif  CSV_ACTIVE
+			fprintf(pTarget, "%.0lf, ", ns);
+		#else
+			printf("Time Elapsed was %.0lf ns.\n", ns);
 		#endif
+	#endif
+
+	#ifdef CSV_ACTIVE
+		fclose(pTarget);
 	#endif
 
 	return 0;
