@@ -14,8 +14,9 @@ typedef union {
 #define MCPS_RDTSC(cpu_c) __asm__ __volatile__ ("rdtsc" : \
                      "=a" ((cpu_c).int32.lo), "=d"((cpu_c).int32.hi))
 
-int    clock_gettime(clockid_t clk_id, struct timespec *tp);
+int    			clock_gettime(clockid_t clk_id, struct timespec *tp);
 struct timespec ts_diff(struct timespec start, struct timespec end);
-double measure_cps(void);
+double          double_diff(struct timespec start, struct timespec end);
+double 			measure_cps(void);
 
 #endif

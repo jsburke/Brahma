@@ -71,3 +71,10 @@ double measure_cps()
 
   return CPS;
 }
+
+// like ts_diff, but returns number of ns to a double
+double double_diff(struct timespec start, struct timespec end)
+{
+  struct timespec temp = ts_diff(start, end);
+  return ((double) temp.tv_sec) * 1.0e9 + ((double) temp.tv_nsec);
+}
