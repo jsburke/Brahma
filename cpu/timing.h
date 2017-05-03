@@ -18,5 +18,6 @@ int    			clock_gettime(clockid_t clk_id, struct timespec *tp);
 struct timespec ts_diff(struct timespec start, struct timespec end);
 double          double_diff(struct timespec start, struct timespec end);
 double 			measure_cps(void);
+double 			CPE_calculate(double ns_iter, int elements);
 
 #endif
