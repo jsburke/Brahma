@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
 				iter_avg += double_diff(iter_start[i], iter_end[i]);  //saturation issues?
 			
 			iter_avg /= EXIT_COUNT;
-			printf("Average time per iteration: %.0lf ns\n", iter_avg);
+			printf("CPE : %.0lf cycles\n", CPE_calculate(iter_avg, num_bodies));
 		#endif
 	#endif
 
