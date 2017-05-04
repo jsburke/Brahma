@@ -1,11 +1,5 @@
 #include "cpu_octree.h"
 
-#ifdef VECTOR_ACTIVE
-	#include <immintrin.h>
-	void 	position_update_vec();
-	void 	velocity_update_vec();
-#endif
-
 const	data_t GRAV_CONST = 6.674e-11;
 #define LINE_LEN			512
 
@@ -180,7 +174,8 @@ void 	body_octant_force_accum(octant* local, int leaf, octant* distal)
 #ifdef VECTOR_ACTIVE
 void 	body_body_force_accum_vec(octant* oct, int focus, int comp)
 {
-	__m256d r_x, r_y, r_z, f_part;
+	
+	__m256d r_x, r_y, r_z, r, f_part;
 	__m256d *comp_r_x = (__m256d*) &(oct->pos_x[comp]);
 	__m256d *comp_r_y = (__m256d*) &(oct->pos_y[comp]);
 	__m256d *comp_r_z = (__m256d*) &(oct->pos_z[comp]);
@@ -201,29 +196,34 @@ void 	body_body_force_accum_vec(octant* oct, int focus, int comp)
 	focus_r_z = _mm256_mul_pd(r_z, r_z);
 
 	// sum the squares into a recycled point
-	focus_r_x = _mm256_add_pd(focus_r_x, focus_r_y);
-	focus_r_x = _mm256_add_pd(focus_r_x, focus_r_z);
+	r = _mm256_add_pd(focus_r_x, focus_r_y);
+	r = _mm256_add_pd(r, focus_r_z);
 
 	// squareroot of the sum of squares, focus_r_x contains four scalar distances
-	focus_r_x = _mm256_sqrt_pd(focus_r_x);
+	r = _mm256_sqrt_pd(r);
 
 	// collect masses for force calc
 	__m256d mass1 = _mm256_set1_pd(oct->mass[focus]);
 	__m256d *mass2 = (__m256d*) &(oct->mass[comp]);
 	mass1 = _mm256_mul_pd(mass1, *mass2);
 
+	focus_r_y = _mm256_mul_pd(r, r);  // first radius multiply
+
 	__m256d g = _mm256_set1_pd(GRAV_CONST);
 
-	mass1 = _mm256_mul_pd(g, mass1);
-	focus_r_y = _mm256_mul_pd(focus_r_x, focus_r_x);	
-	focus_r_x = _mm256_mul_pd(focus_r_y, focus_r_x);
+	__m256d force_top;
+	force_top = _mm256_mul_pd(g, mass1);  //top half of divide
+		
+	r = _mm256_mul_pd(focus_r_y, r);      // r^3
 
-	f_part = _mm256_div_pd(mass1,focus_r_x);
+	f_part = _mm256_div_pd(force_top,r);  // partial force calculated
 
 	// calculation of vector forces
-	focus_r_x = _mm256_mul_pd(f_part, r_x);	
-	focus_r_y = _mm256_mul_pd(f_part, r_y);	
-	focus_r_z = _mm256_mul_pd(f_part, r_z);
+	__m256d f_part_x, f_part_y, f_part_z;
+
+	f_part_x = _mm256_mul_pd(f_part, r_x);	
+	f_part_y = _mm256_mul_pd(f_part, r_y);	
+	f_part_z = _mm256_mul_pd(f_part, r_z);
 
 	__m256d *fma_comp_x = (__m256d*) &(oct->fma_x[comp]);
 	__m256d *fma_comp_y = (__m256d*) &(oct->fma_y[comp]);
@@ -247,13 +247,15 @@ void 	body_body_force_accum_vec(octant* oct, int focus, int comp)
 	//  push lower sum into double for easy use
 	data_t F_x, F_y, F_z;
 
-	_mm256_store_pd(&F_x, focus_r_x);
-	_mm256_store_pd(&F_y, focus_r_y);
-	_mm256_store_pd(&F_z, focus_r_z);
+	_mm_store_sd(&F_x, _mm256_castpd256_pd128(focus_r_x));
+	_mm_store_sd(&F_y, _mm256_castpd256_pd128(focus_r_y));
+	_mm_store_sd(&F_z, _mm256_castpd256_pd128(focus_r_z));
+
 
 	oct->fma_x[focus] += F_x;
 	oct->fma_y[focus] += F_y;
 	oct->fma_z[focus] += F_z;
+
 }
 #endif
 		// VECTOR_ACTIVE
@@ -275,20 +277,27 @@ void	force_accum(octant* root)
 			//  force interactions in suboctant
 			for(k = 0; k < leaf_count; k++)
 			{
-				for(m = k + 1; m < leaf_count; m++)
-					body_body_force_accum(local, k, m);
+				#ifdef VECTOR_ACTIVE
+					for(m = k + 1; m%4 != 0; m++)
+						body_body_force_accum(local, k, m);
 
-				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);				
+					for(;(m+3) < leaf_count;m += 4)
+						body_body_force_accum_vec(local, k, m);
+
+					for(;m < leaf_count; m++)
+						body_body_force_accum(local, k, m);
+				#else
+					for(m = k + 1; m < leaf_count; m++)
+						body_body_force_accum(local, k, m);
+				#endif
 
 				for(m = 0; m < CHILD_COUNT; m++)
 					if(m != j)body_octant_force_accum(local, k, root->children[i]->children[m]);
 
-				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);				
 
 				for(m = 0; m < CHILD_COUNT; m++)
 					if(m != i)body_octant_force_accum(local, k, root->children[m]);
 
-				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);
 			}
 		}
 }

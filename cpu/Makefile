@@ -11,7 +11,7 @@ OCT = OCTREE_CPU
 OCT_OBJS = cpu_octree.o octree.o timing.o
 
 OCT_VEC = OCTREE_VEC
-OCT_VEC_OBJS = cpu_octree_vec.o octree.o timing.o
+OCT_VEC_OBJS = cpu_octree_vec.o octree_vec.o timing.o
 
 OCT_OMP = OCTREE_OMP
 OCT_OMP_OBJS = cpu_octree_omp.o octree.o timing.o
@@ -52,7 +52,7 @@ n2n: main_n2n.c cpu_n2n.o timing.o
 octree: main_octree.c cpu_octree.o octree.o timing.o
 	$(CC) $(OPT) $(FLAGS) main_octree.c $(OCT_OBJS) -o $(OCT) $(LINK) $(SERIAL_DEFINES)
 
-octree_vec: main_octree.c cpu_octree_vec.o octree.o timing.o
+octree_vec: main_octree.c cpu_octree_vec.o octree_vec.o timing.o
 	$(CC) $(OPT) $(FLAGS) $(INTEL) main_octree.c $(OCT_VEC_OBJS) -o $(OCT_VEC) $(LINK) $(SERIAL_DEFINES) -DVECTOR_ACTIVE
 
 octree_omp: main_octree.c cpu_octree_omp.o octree.o timing.o
@@ -63,6 +63,9 @@ cpu_n2n.o: cpu_n2n.c
 
 octree.o: octree.c
 	$(CC) $(OPT) $(FLAGS) -c octree.c
+
+octree_vec.o: octree.c
+	$(CC) $(OPT) $(FLAGS) -c octree.c -o octree_vec.o -DVECTOR_ACTIVE
 
 cpu_octree.o: octree.o cpu_octree.c
 	$(CC) $(OPT) $(FLAGS) octree.o -c cpu_octree.c

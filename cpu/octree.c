@@ -23,7 +23,7 @@ octant*		octant_new(int lvl)
 
 	if(lvl == LEVEL_2)  // most common case first
 	{
-		oct->mass = (data_t*) calloc(AREA_CAPACITY, sizeof(data_t));
+		oct->mass = (data_t*) ALLOC(AREA_CAPACITY, sizeof(data_t));
 		if(!(oct->mass))
 		{
 			printf("ERROR: failed to calloc masses, level %d\n", lvl);
@@ -36,21 +36,21 @@ octant*		octant_new(int lvl)
 		//
 		/////////////////////////////////////////////////////////////
 
-		oct->pos_x = (data_t*) calloc(AREA_CAPACITY, sizeof(data_t));
+		oct->pos_x = (data_t*) ALLOC(AREA_CAPACITY, sizeof(data_t));
 		if(!(oct->mass))
 		{
 			printf("ERROR: failed to calloc x positions, level %d\n", lvl);
 			return NULL;
 		}
 
-		oct->pos_y = (data_t*) calloc(AREA_CAPACITY, sizeof(data_t));
+		oct->pos_y = (data_t*) ALLOC(AREA_CAPACITY, sizeof(data_t));
 		if(!(oct->mass))
 		{
 			printf("ERROR: failed to calloc y positions, level %d\n", lvl);
 			return NULL;
 		}
 
-		oct->pos_z = (data_t*) calloc(AREA_CAPACITY, sizeof(data_t));
+		oct->pos_z = (data_t*) ALLOC(AREA_CAPACITY, sizeof(data_t));
 		if(!(oct->mass))
 		{
 			printf("ERROR: failed to calloc z positions, level %d\n", lvl);
@@ -63,21 +63,21 @@ octant*		octant_new(int lvl)
 		//
 		/////////////////////////////////////////////////////////////
 
-		oct->vel_x = (data_t*) calloc(AREA_CAPACITY, sizeof(data_t));
+		oct->vel_x = (data_t*) ALLOC(AREA_CAPACITY, sizeof(data_t));
 		if(!(oct->mass))
 		{
 			printf("ERROR: failed to calloc x velocities, level %d\n", lvl);
 			return NULL;
 		}
 
-		oct->vel_y = (data_t*) calloc(AREA_CAPACITY, sizeof(data_t));
+		oct->vel_y = (data_t*) ALLOC(AREA_CAPACITY, sizeof(data_t));
 		if(!(oct->mass))
 		{
 			printf("ERROR: failed to calloc y velocities, level %d\n", lvl);
 			return NULL;
 		}
 
-		oct->vel_z = (data_t*) calloc(AREA_CAPACITY, sizeof(data_t));
+		oct->vel_z = (data_t*) ALLOC(AREA_CAPACITY, sizeof(data_t));
 		if(!(oct->mass))
 		{
 			printf("ERROR: failed to calloc z velocities, level %d\n", lvl);
@@ -90,21 +90,21 @@ octant*		octant_new(int lvl)
 		//
 		/////////////////////////////////////////////////////////////
 
-		oct->fma_x = (data_t*) calloc(AREA_CAPACITY, sizeof(data_t));
+		oct->fma_x = (data_t*) ALLOC(AREA_CAPACITY, sizeof(data_t));
 		if(!(oct->mass))
 		{
 			printf("ERROR: failed to calloc x force -- acceleration vectors, level %d\n", lvl);
 			return NULL;
 		}
 
-		oct->fma_y = (data_t*) calloc(AREA_CAPACITY, sizeof(data_t));
+		oct->fma_y = (data_t*) ALLOC(AREA_CAPACITY, sizeof(data_t));
 		if(!(oct->mass))
 		{
 			printf("ERROR: failed to calloc y force -- acceleration vectors, level %d\n", lvl);
 			return NULL;
 		}
 
-		oct->fma_z = (data_t*) calloc(AREA_CAPACITY, sizeof(data_t));
+		oct->fma_z = (data_t*) ALLOC(AREA_CAPACITY, sizeof(data_t));
 		if(!(oct->mass))
 		{
 			printf("ERROR: failed to calloc z force -- acceleration vectors, level %d\n", lvl);
