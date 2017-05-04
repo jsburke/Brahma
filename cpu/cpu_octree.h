@@ -23,9 +23,9 @@
 //  Functions & Macros for the math that will be needed
 #define DISTANCE(r_x, r_y, r_z) SQRT((r_x * r_x) + (r_y * r_y) + (r_z * r_z))
 #define FORCE_PARTIAL(g, m1, m2, r) g*((m1 * m2)/(r * r * r))
-
 // NB : expansion below is one MUL less than direct implementation
 #define DISPLACE(vel, accel, time) time * (vel + (0.5 * accel * time))
+
 
 int 	body_count(char* filename);
 int 	fileread_build_tree(char* filename, octant *root, int len);
@@ -35,5 +35,7 @@ void	force_accum(octant* root);
 
 void	position_update(octant* root, int timestep);
 void	velocity_update(octant* root, int timestep);
+
+
 
 #endif

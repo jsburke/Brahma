@@ -9,6 +9,9 @@ N2N_OBJS = cpu_n2n.o timing.o
 OCT = OCTREE_CPU
 OCT_OBJS = cpu_octree.o octree.o timing.o
 
+OCT_VEC = OCTREE_VEC
+OCT_VEC_OBJS = cpu_octree_vec.o octree.o timing.o
+
 OCT_OMP = OCTREE_OMP
 OCT_OMP_OBJS = cpu_octree_omp.o octree.o timing.o
 
@@ -17,7 +20,7 @@ TIMING_ACTIVE = on
 CPE_ACTIVE    = on
 CSV_ACTIVE	  = on
 
-THREAD_DEFINES = -DTHREAD_ACTIVE
+THREAD_DEFINES = -DTHREAD_ACTIVE -DVECTOR_ACTIVE 
 
 ifeq ($(TEST_PRINT), on)
 	THREAD_DEFINES += -DTEST_PRINT
@@ -48,8 +51,11 @@ n2n: main_n2n.c cpu_n2n.o timing.o
 octree: main_octree.c cpu_octree.o octree.o timing.o
 	$(CC) $(OPT) $(FLAGS) main_octree.c $(OCT_OBJS) -o $(OCT) $(LINK) $(SERIAL_DEFINES)
 
+octree_vec: main_octree.c cpu_octree_vec.o octree.o timing.o
+	$(CC) $(OPT) $(FLAGS) -mavx2 main_octree.c $(OCT_VEC_OBJS) -o $(OCT_VEC) $(LINK) $(SERIAL_DEFINES) -DVECTOR_ACTIVE
+
 octree_omp: main_octree.c cpu_octree_omp.o octree.o timing.o
-	$(CC) $(OPT) $(FLAGS) -fopenmp main_octree.c $(OCT_OMP_OBJS) -o $(OCT_OMP) $(LINK) $(THREAD_DEFINES)
+	$(CC) $(OPT) $(FLAGS) -mavx2 -fopenmp main_octree.c $(OCT_OMP_OBJS) -o $(OCT_OMP) $(LINK) $(THREAD_DEFINES)
 
 cpu_n2n.o: cpu_n2n.c
 	$(CC) $(OPT) $(FLAGS) -c cpu_n2n.c
@@ -59,6 +65,9 @@ octree.o: octree.c
 
 cpu_octree.o: octree.o cpu_octree.c
 	$(CC) $(OPT) $(FLAGS) octree.o -c cpu_octree.c
+
+cpu_octree_vec.o: octree.o cpu_octree.c
+	$(CC) $(OPT) $(FLAGS) -mavx2 octree.o -c cpu_octree.c -o cpu_octree_vec.o -DVECTOR_ACTIVE
 
 cpu_octree_omp.o: octree.o cpu_octree.c
 	$(CC) $(OPT) $(FLAGS) -fopenmp octree.o -c cpu_octree.c -o cpu_octree_omp.o $(THREAD_DEFINES)

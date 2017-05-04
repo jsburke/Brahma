@@ -1,5 +1,11 @@
 #include "cpu_octree.h"
 
+#ifdef VECTOR_ACTIVE
+	#include <immintrin.h>
+	void 	position_update_vec();
+	void 	velocity_update_vec();
+#endif
+
 const	data_t GRAV_CONST = 6.674e-11;
 #define LINE_LEN			512
 
@@ -145,9 +151,9 @@ void 	body_body_force_accum(octant* oct, int focus, int comp)
 	oct->fma_y[focus] += F_y;
 	oct->fma_z[focus] += F_z;
 
-	oct->fma_x[comp] += -F_x;
-	oct->fma_y[comp] += -F_y;
-	oct->fma_z[comp] += -F_z;
+	oct->fma_x[comp] -= F_x;
+	oct->fma_y[comp] -= F_y;
+	oct->fma_z[comp] -= F_z;
 }
 
 void 	body_octant_force_accum(octant* local, int leaf, octant* distal)
@@ -170,6 +176,87 @@ void 	body_octant_force_accum(octant* local, int leaf, octant* distal)
 	local->fma_y[leaf] += F_part * r_y;
 	local->fma_z[leaf] += F_part * r_z;
 }
+
+#ifdef VECTOR_ACTIVE
+void 	body_body_force_accum_vec(octant* oct, int focus, int comp)
+{
+	__m256d r_x, r_y, r_z, f_part;
+	__m256d *comp_r_x = (__m256d*) &(oct->pos_x[comp]);
+	__m256d *comp_r_y = (__m256d*) &(oct->pos_y[comp]);
+	__m256d *comp_r_z = (__m256d*) &(oct->pos_z[comp]);
+
+	//  broad cast for common subtraction
+	__m256d focus_r_x = _mm256_set1_pd(oct->pos_x[focus]);
+	__m256d focus_r_y = _mm256_set1_pd(oct->pos_y[focus]);
+	__m256d focus_r_z = _mm256_set1_pd(oct->pos_z[focus]);
+
+	//calculate the vector displacements
+	r_x = _mm256_sub_pd(focus_r_x, *comp_r_x);
+	r_y = _mm256_sub_pd(focus_r_y, *comp_r_y);
+	r_z = _mm256_sub_pd(focus_r_z, *comp_r_z);
+
+	// recycle focus for squaring
+	focus_r_x = _mm256_mul_pd(r_x, r_x);
+	focus_r_y = _mm256_mul_pd(r_y, r_y);
+	focus_r_z = _mm256_mul_pd(r_z, r_z);
+
+	// sum the squares into a recycled point
+	focus_r_x = _mm256_add_pd(focus_r_x, focus_r_y);
+	focus_r_x = _mm256_add_pd(focus_r_x, focus_r_z);
+
+	// squareroot of the sum of squares, focus_r_x contains four scalar distances
+	focus_r_x = _mm256_sqrt_pd(focus_r_x);
+
+	// collect masses for force calc
+	__m256d mass1 = _mm256_set1_pd(oct->mass[focus]);
+	__m256d *mass2 = (__m256d*) &(oct->mass[comp]);
+	mass1 = _mm256_mul_pd(mass1, *mass2);
+
+	__m256d g = _mm256_set1_pd(GRAV_CONST);
+
+	mass1 = _mm256_mul_pd(g, mass1);
+	focus_r_y = _mm256_mul_pd(focus_r_x, focus_r_x);	
+	focus_r_x = _mm256_mul_pd(focus_r_y, focus_r_x);
+
+	f_part = _mm256_div_pd(mass1,focus_r_x);
+
+	// calculation of vector forces
+	focus_r_x = _mm256_mul_pd(f_part, r_x);	
+	focus_r_y = _mm256_mul_pd(f_part, r_y);	
+	focus_r_z = _mm256_mul_pd(f_part, r_z);
+
+	__m256d *fma_comp_x = (__m256d*) &(oct->fma_x[comp]);
+	__m256d *fma_comp_y = (__m256d*) &(oct->fma_y[comp]);
+	__m256d *fma_comp_z = (__m256d*) &(oct->fma_z[comp]);
+
+	// apply newton'w third law to non-focus elements
+
+	*fma_comp_x = _mm256_sub_pd(*fma_comp_x, focus_r_x);
+	*fma_comp_y = _mm256_sub_pd(*fma_comp_y, focus_r_y);
+	*fma_comp_z = _mm256_sub_pd(*fma_comp_z, focus_r_z);
+
+	// half adds to sum the four calculations
+	focus_r_x = _mm256_hadd_pd(focus_r_x, focus_r_x);	
+	focus_r_y = _mm256_hadd_pd(focus_r_y, focus_r_y);	
+	focus_r_z = _mm256_hadd_pd(focus_r_z, focus_r_z);
+
+	focus_r_x = _mm256_hadd_pd(focus_r_x, focus_r_x);	
+	focus_r_y = _mm256_hadd_pd(focus_r_y, focus_r_y);	
+	focus_r_z = _mm256_hadd_pd(focus_r_z, focus_r_z);
+
+	//  push lower sum into double for easy use
+	data_t F_x, F_y, F_z;
+
+	F_x = _mm256_cvtsd_f64(focus_r_x);
+	F_y = _mm256_cvtsd_f64(focus_r_y);
+	F_z = _mm256_cvtsd_f64(focus_r_z);
+
+	oct->fma_x[focus] += F_x;
+	oct->fma_y[focus] += F_y;
+	oct->fma_z[focus] += F_z;
+}
+#endif
+		// VECTOR_ACTIVE
 
 void	force_accum(octant* root)
 {
@@ -266,3 +353,17 @@ void	velocity_update(octant* root, int timestep)
 			}
 		}
 }
+
+
+#ifdef VECTOR_ACTIVE
+void 	position_update_vec()
+{
+
+}
+
+void 	velocity_update_vec()
+{
+
+}
+#endif 
+		// VECTOR_ACTIVE
