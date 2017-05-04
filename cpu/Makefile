@@ -1,3 +1,9 @@
+TEST_PRINT    	 = off
+TIMING_ACTIVE 	 = on
+CPE_ACTIVE    	 = off
+CSV_ACTIVE	  	 = off
+VALGRIND_ACTIVE  = on
+
 CC = gcc
 OPT = -O3
 FLAGS = -Wall
@@ -15,11 +21,6 @@ OCT_VEC_OBJS = cpu_octree_vec.o octree_vec.o timing.o
 
 OCT_OMP = OCTREE_OMP
 OCT_OMP_OBJS = cpu_octree_omp.o octree.o timing.o
-
-TEST_PRINT    = off
-TIMING_ACTIVE = on
-CPE_ACTIVE    = off
-CSV_ACTIVE	  = off
 
 THREAD_DEFINES = -DTHREAD_ACTIVE -DVECTOR_ACTIVE 
 
@@ -43,6 +44,9 @@ ifeq ($(CSV_ACTIVE), on)
 	SERIAL_DEFINES += -DCSV_ACTIVE
 endif
 
+ifeq ($(VALGRIND_ACTIVE), on)
+	FLAGS += -g
+endif
 
 all: n2n octree octree_vec octree_omp
 
