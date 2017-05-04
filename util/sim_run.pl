@@ -45,12 +45,23 @@ if (!(-x $octomp)) {
   die "$myname: No binary $octomp, compile error?\n";
 }
 
+$file = "results.csv";
+if(-e $file){
+	system("rm $file");
+}
+system("touch $file");
+open($fp, '>>', $file) or die "perl failed to open $file.";
+print $fp "Method, ";
+
 print "\nProduce CSV files for execution\n";
 
 foreach $count(@objectCounts)
 {
 	system("$bodyGen --total $count");
+	print $fp "$count, ";
 }
+
+print $fp "\n";
 
 # for spacing
 print "  BEGIN EXECUTION \n\n";
@@ -58,6 +69,8 @@ print "  BEGIN EXECUTION \n\n";
 # run a series of tests
 # harvest data
 
+print $fp "Brute Force, ";
+close $fp;
 foreach $count(@objectCounts)
 {
 	print "N2N $count:\n";
@@ -65,6 +78,9 @@ foreach $count(@objectCounts)
 	print "\n";
 }
 
+open($fp, '>>', $file) or die "perl failed to open $file for Octree.";
+print $fp "\nOctree, ";
+close $fp;
 foreach $count(@objectCounts)
 {
 	print "OCTREE $count:\n";
@@ -72,6 +88,9 @@ foreach $count(@objectCounts)
 	print "\n";
 }
 
+open($fp, '>>', $file) or die "perl failed to open $file for Parallel Octree.";
+print $fp "\nParallel Octree, ";
+close $fp;
 foreach $count(@objectCounts)
 {
 	print "OCTREE_OMP $count:\n";
@@ -80,7 +99,7 @@ foreach $count(@objectCounts)
 }
 
 print "clean up\n";
-system("rm *.csv");
 system("make clean");
+system("rm galaxy_*.csv");
 
-print "run_sim complete\n";
+print "$myname complete\n";

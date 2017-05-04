@@ -1,6 +1,7 @@
 #include "timing.h"
 
-double CPS = 2.9e9;  // Cycles per second  -  adjust in measure_cps()
+double CPS     = 2.9e9; // Cycles per second  -  adjust in measure_cps()
+double s_to_ns = 1.0e-9; // Convert seconds to ns
 
 double ts_sec(struct timespec ts)
 {
@@ -67,20 +68,19 @@ double measure_cps()
   total_time = ts_sec(ts_diff(cal_start, cal_end));
   total_cycles = (double)(tsc_end.int64-tsc_start.int64);
   CPS = total_cycles / total_time;
-  printf("z == %f, CPS == %g\n", z, CPS);
+  //printf("z == %f, CPS == %g\n", z, CPS);
 
   return CPS;
 }
 
-struct timespec diff(struct timespec start, struct timespec end)
+// like ts_diff, but returns number of ns to a double
+double double_diff(struct timespec start, struct timespec end)
 {
-  struct timespec temp;
-  if ((end.tv_nsec-start.tv_nsec)<0) {
-    temp.tv_sec = end.tv_sec-start.tv_sec-1;
-    temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
-  } else {
-    temp.tv_sec = end.tv_sec-start.tv_sec;
-    temp.tv_nsec = end.tv_nsec-start.tv_nsec;
-  }
-  return temp;
+  struct timespec temp = ts_diff(start, end);
+  return ((double) temp.tv_sec) * 1.0e9 + ((double) temp.tv_nsec);
+}
+
+double CPE_calculate(double ns_iter, int elements)
+{
+  return (CPS * s_to_ns * ns_iter)/((double) elements);
 }

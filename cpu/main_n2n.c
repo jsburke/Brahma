@@ -22,6 +22,10 @@
 	#define TIMING_MODE				CLOCK_PROCESS_CPUTIME_ID  // change me for parallel
 #endif
 
+#ifdef  CSV_ACTIVE
+	#define TARGET_FILE ((const char*) "results.csv")
+#endif
+
 ////////////////////////////////////////////////////////////////////
 //
 // Inputs: a file name of the form galaxy_###.csv, where the number
@@ -52,7 +56,11 @@ int main(int argc, char *argv[])
 	int num_bodies = 0;
 
 	#ifdef TIMING_ACTIVE
-		struct timespec time_start, time_end, time_elapse;
+		struct timespec total_start, total_end, total_elapse;  // for total execution time
+		#ifdef CPE_ACTIVE
+			struct timespec iter_start[EXIT_COUNT], iter_end[EXIT_COUNT];
+			double 			iter_avg;
+		#endif
 	#endif
 
 	// for doing the calculations over
@@ -115,11 +123,21 @@ int main(int argc, char *argv[])
 
 	#ifdef TIMING_ACTIVE
 		measure_cps();
-		clock_gettime(TIMING_MODE, &time_start);
+		clock_gettime(TIMING_MODE, &total_start);
+	#endif
+
+	#ifdef CSV_ACTIVE
+		FILE *pTarget = fopen(TARGET_FILE, "a");
 	#endif
 
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
+		#ifdef TIMING_ACTIVE
+			#ifdef CPE_ACTIVE
+				clock_gettime(TIMING_MODE, &iter_start[i]);
+			#endif
+		#endif
+
 		//printf("Position (x, y, z) of body 5: (%f, %f, %f)\n", pos_x[4], pos_y[4], pos_z[4]);
 		force_zero(fma_x, fma_y, fma_z, num_bodies);		
 
@@ -132,13 +150,40 @@ int main(int argc, char *argv[])
 		position_update(mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z, fma_x, fma_y, fma_z, num_bodies, TIME_STEP);
 		velocity_update(mass, vel_x, vel_y, vel_z, fma_x, fma_y, fma_z, num_bodies, TIME_STEP);
 		//  if we get graphics in, update screen here
+
+		#ifdef TIMING_ACTIVE
+			#ifdef CPE_ACTIVE
+				clock_gettime(TIMING_MODE, &iter_end[i]);
+			#endif
+		#endif
 	}
 
 	#ifdef TIMING_ACTIVE
-		clock_gettime(TIMING_MODE, &time_end);
-		time_elapse = ts_diff(time_start, time_end);
-		double ns = ((double) time_elapse.tv_sec) * 1.0e9 + ((double) time_elapse.tv_nsec);
-		printf("Time Elapsed was %.0lf ns.\n", ns);
+		clock_gettime(TIMING_MODE, &total_end);
+		total_elapse = ts_diff(total_start, total_end);
+		double ns = ((double) total_elapse.tv_sec) * 1.0e9 + ((double) total_elapse.tv_nsec);
+
+		#ifdef CPE_ACTIVE
+			iter_avg = 0;
+			for(i = 0; i < EXIT_COUNT; i++)
+				iter_avg += double_diff(iter_start[i], iter_end[i]);  //saturation issues?
+			iter_avg /= EXIT_COUNT;
+
+			#ifdef CSV_ACTIVE
+				fprintf(pTarget, "%.0lf, ", CPE_calculate(iter_avg, num_bodies));
+			#else
+				printf("CPE : %.0lf cycles\n", CPE_calculate(iter_avg, num_bodies));
+			#endif
+				
+		#elif  CSV_ACTIVE
+			fprintf(pTarget, "%.0lf, ", ns);
+		#else
+			printf("Time Elapsed was %.0lf ns.\n", ns);
+		#endif
+	#endif
+
+	#ifdef CSV_ACTIVE
+		fclose(pTarget);
 	#endif
 
 	return 0;

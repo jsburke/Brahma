@@ -14,6 +14,8 @@ OCT_OMP_OBJS = cpu_octree_omp.o octree.o timing.o
 
 TEST_PRINT    = off
 TIMING_ACTIVE = on
+CPE_ACTIVE    = on
+CSV_ACTIVE	  = on
 
 THREAD_DEFINES = -DTHREAD_ACTIVE
 
@@ -27,11 +29,21 @@ ifeq ($(TIMING_ACTIVE), on)
 	SERIAL_DEFINES += -DTIMING_ACTIVE
 endif
 
+ifeq ($(CPE_ACTIVE), on)
+	THREAD_DEFINES += -DCPE_ACTIVE
+	SERIAL_DEFINES += -DCPE_ACTIVE
+endif
+
+ifeq ($(CSV_ACTIVE), on)
+	THREAD_DEFINES += -DCSV_ACTIVE
+	SERIAL_DEFINES += -DCSV_ACTIVE
+endif
+
 
 all: n2n octree octree_omp
 
 n2n: main_n2n.c cpu_n2n.o timing.o
-	$(CC) $(OPT) $(FLAGS) main_n2n.c $(N2N_OBJS) -o $(N2N) $(LINK)
+	$(CC) $(OPT) $(FLAGS) main_n2n.c $(N2N_OBJS) -o $(N2N) $(LINK) $(SERIAL_DEFINES)
 
 octree: main_octree.c cpu_octree.o octree.o timing.o
 	$(CC) $(OPT) $(FLAGS) main_octree.c $(OCT_OBJS) -o $(OCT) $(LINK) $(SERIAL_DEFINES)
