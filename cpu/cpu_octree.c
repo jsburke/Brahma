@@ -247,9 +247,9 @@ void 	body_body_force_accum_vec(octant* oct, int focus, int comp)
 	//  push lower sum into double for easy use
 	data_t F_x, F_y, F_z;
 
-	F_x = _mm256_cvtsd_f64(focus_r_x);
-	F_y = _mm256_cvtsd_f64(focus_r_y);
-	F_z = _mm256_cvtsd_f64(focus_r_z);
+	_mm256_store_pd(&F_x, focus_r_x);
+	_mm256_store_pd(&F_y, focus_r_y);
+	_mm256_store_pd(&F_z, focus_r_z);
 
 	oct->fma_x[focus] += F_x;
 	oct->fma_y[focus] += F_y;
