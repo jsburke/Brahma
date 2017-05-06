@@ -1,7 +1,15 @@
 #include "cpu_octree.h"
 
 const	data_t GRAV_CONST = 6.674e-11;
+const 	data_t HALF_TIME, TIME;
+
 #define LINE_LEN			512
+
+void	time_set_up(timestep)
+{
+	HALF_TIME = 0.5 * timestep;
+	TIME 	  = timestep;
+}
 
 int		body_count(char* filename)
 {
@@ -203,7 +211,7 @@ void	force_accum(octant* root)
 		}
 }
 
-void	position_update(octant* root, int timestep)
+void	position_update(octant* root)
 {
 	int 		i, j, k, leaf_count;
 	octant* 	local;
@@ -219,65 +227,6 @@ void	position_update(octant* root, int timestep)
 			octant* local = root->children[i]->children[j];
 			leaf_count    = local->leaf_count;
 
-			#ifdef VECTOR_ACTIVE
-				// for(k = 0; k % 4 != 0; k++)  // align  maybe can optimize away
-				// {
-
-				// 	mass 			  = local->mass[k];
-				// 	local->fma_x[k]  /= mass;
-				// 	local->fma_y[k]  /= mass;
-				// 	local->fma_z[k]  /= mass;
-
-					
-				// 	local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], timestep);
-				// 	local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], timestep);
-				// 	local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], timestep);
-
-				// }
-
-				__m256d mm_half_time;  // should be able to set psuedo constant...
-				mm_half_time = _mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_set1_epi32(timestep));
-
-				int loop_sz = leaf_count/4;
-				int m;
-				for(m = 0; m < loop_sz; m++)
-				{
-					__m256d *mm_fma_x, *mm_fma_y, *mm_fma_z, *mm_vel_x, *mm_vel_y, *mm_vel_z, *mm_mass;
-
-					mm_mass  = (__m256d *) &(local->mass[m]);
-					mm_fma_x = (__m256d *) &(local->fma_x[m]);
-					mm_fma_y = (__m256d *) &(local->fma_y[m]);
-					mm_fma_z = (__m256d *) &(local->fma_z[m]);
-
-					*mm_fma_x = _mm256_div_pd(*mm_fma_x, *mm_mass);
-					*mm_fma_y = _mm256_div_pd(*mm_fma_y, *mm_mass);
-					*mm_fma_z = _mm256_div_pd(*mm_fma_z, *mm_mass);
-
-					mm_vel_x = (__m256d *) &(local->vel_x[m]);
-					mm_vel_y = (__m256d *) &(local->vel_y[m]);
-					mm_vel_z = (__m256d *) &(local->vel_z[m]);
-
-					
-					k += 4;
-				}
-
-				for(; k % 4 != 0; k++)  // cleanup
-				{
-
-					mass 			  = local->mass[k];
-					local->fma_x[k]  /= mass;
-					local->fma_y[k]  /= mass;
-					local->fma_z[k]  /= mass;
-
-					
-					local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], timestep);
-					local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], timestep);
-					local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], timestep);
-
-				}
-			#else
-
-			#endif
 			for(k = 0; k < leaf_count; k++)
 			{
 
@@ -295,7 +244,7 @@ void	position_update(octant* root, int timestep)
 		}
 }
 
-void	velocity_update(octant* root, int timestep)
+void	velocity_update(octant* root)
 {
 	int 		i, j, k, leaf_count;
 	octant* 	local;
