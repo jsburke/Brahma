@@ -219,23 +219,78 @@ void	position_update(octant* root, int timestep)
 			octant* local = root->children[i]->children[j];
 			leaf_count    = local->leaf_count;
 
+			#ifdef VECTOR_ACTIVE
+				// for(k = 0; k % 4 != 0; k++)  // align  maybe can optimize away
+				// {
+
+				// 	mass 			  = local->mass[k];
+				// 	local->fma_x[k]  /= mass;
+				// 	local->fma_y[k]  /= mass;
+				// 	local->fma_z[k]  /= mass;
+
+					
+				// 	local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], timestep);
+				// 	local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], timestep);
+				// 	local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], timestep);
+
+				// }
+
+				__m256d mm_half_time;  // should be able to set psuedo constant...
+				mm_half_time = _mm256_mul_pd(_mm256_set1_pd(0.5), _mm256_set1_epi32(timestep));
+
+				int loop_sz = leaf_count/4;
+				int m;
+				for(m = 0; m < loop_sz; m++)
+				{
+					__m256d *mm_fma_x, *mm_fma_y, *mm_fma_z, *mm_vel_x, *mm_vel_y, *mm_vel_z, *mm_mass;
+
+					*mm_mass  = &(local->mass[m]);
+					*mm_fma_x = &(local->fma_x[m]);
+					*mm_fma_y = &(local->fma_y[m]);
+					*mm_fma_z = &(local->fma_z[m]);
+
+					*mm_fma_x = _mm256_div_pd(*mm_fma_x, *mm_mass);
+					*mm_fma_y = _mm256_div_pd(*mm_fma_y, *mm_mass);
+					*mm_fma_z = _mm256_div_pd(*mm_fma_z, *mm_mass);
+
+					*mm_vel_x = &(local->vel_x[m]);
+					*mm_vel_y = &(local->vel_y[m]);
+					*mm_vel_z = &(local->vel_z[m]);
+
+					
+					k += 4;
+				}
+
+				for(; k % 4 != 0; k++)  // cleanup
+				{
+
+					mass 			  = local->mass[k];
+					local->fma_x[k]  /= mass;
+					local->fma_y[k]  /= mass;
+					local->fma_z[k]  /= mass;
+
+					
+					local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], timestep);
+					local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], timestep);
+					local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], timestep);
+
+				}
+			#else
+
+			#endif
 			for(k = 0; k < leaf_count; k++)
 			{
-
-				//printf("(%d, %d, %d) has %.5lf kg is at (%.3lf, %.3lf, %.3lf)\n", i, j, k, local->mass[k], local->fma_x[k], local->fma_y[k], local->fma_z[k]);
 
 				mass 			  = local->mass[k];
 				local->fma_x[k]  /= mass;
 				local->fma_y[k]  /= mass;
 				local->fma_z[k]  /= mass;
 
-				//printf("(%d, %d, %d) has %.5lf kg is at (%.3lf, %.3lf, %.3lf)\n", i, j, k, local->mass[k], local->fma_x[k], local->fma_y[k], local->fma_z[k]);
-
+				
 				local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], timestep);
 				local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], timestep);
 				local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], timestep);
 
-				//printf("(%d, %d, %d) is at (%.3lf, %.3lf, %.3lf)\n", i, j, k, local->pos_x[k], local->pos_y[k], local->pos_z[k]);
 			}
 		}
 }
