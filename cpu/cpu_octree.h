@@ -22,8 +22,6 @@
 
 #ifdef VECTOR_ACTIVE
 	#include <immintrin.h>
-	void 	position_update_vec();
-	void 	velocity_update_vec();
 #endif
 
 //  Functions & Macros for the math that will be needed
