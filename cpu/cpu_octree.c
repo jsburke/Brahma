@@ -244,18 +244,18 @@ void	position_update(octant* root, int timestep)
 				{
 					__m256d *mm_fma_x, *mm_fma_y, *mm_fma_z, *mm_vel_x, *mm_vel_y, *mm_vel_z, *mm_mass;
 
-					*mm_mass  = &(local->mass[m]);
-					*mm_fma_x = &(local->fma_x[m]);
-					*mm_fma_y = &(local->fma_y[m]);
-					*mm_fma_z = &(local->fma_z[m]);
+					mm_mass  = (__m256d *) &(local->mass[m]);
+					mm_fma_x = (__m256d *) &(local->fma_x[m]);
+					mm_fma_y = (__m256d *) &(local->fma_y[m]);
+					mm_fma_z = (__m256d *) &(local->fma_z[m]);
 
 					*mm_fma_x = _mm256_div_pd(*mm_fma_x, *mm_mass);
 					*mm_fma_y = _mm256_div_pd(*mm_fma_y, *mm_mass);
 					*mm_fma_z = _mm256_div_pd(*mm_fma_z, *mm_mass);
 
-					*mm_vel_x = &(local->vel_x[m]);
-					*mm_vel_y = &(local->vel_y[m]);
-					*mm_vel_z = &(local->vel_z[m]);
+					mm_vel_x = (__m256d *) &(local->vel_x[m]);
+					mm_vel_y = (__m256d *) &(local->vel_y[m]);
+					mm_vel_z = (__m256d *) &(local->vel_z[m]);
 
 					
 					k += 4;
