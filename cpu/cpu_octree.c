@@ -118,6 +118,85 @@ void	force_zero(octant* root)
 		}
 }
 
+
+#ifdef VECTOR_ACTIVE
+void 	body_body_force_accum(octant* oct, int focus, int comp)
+{
+	
+	__m256d r_focus, r_comp, r_vec, r_sq, r_sqsum, r;
+	__m256d mass_focus, mass_comp, g_vec, f_part, f_vec, f_focus, f_comp;
+
+
+	// pack the positions into a wide reg
+	r_focus = _mm256_set_pd(oct->pos_x[focus], oct->pos_y[focus], oct->pos_z[focus], 0.0);
+	r_comp  = _mm256_set_pd(oct->pos_x[comp], oct->pos_y[comp], oct->pos_z[comp], 0.0);
+
+	// get the vector displacements, will be reused for vector forces
+	r_vec   = _mm256_sub_pd(r_focus, r_comp);
+
+	//square
+	r_sq    = _mm256_mul_pd(r_vec, r_vec);
+
+	//half adds to sum squares
+	r_sqsum = _mm256_hadd_pd(r_sq, r_sq);
+	r_sqsum = _mm256_hadd_pd(r_sqsum, r_sqsum);
+
+	//sqrt for distance
+	r       = _mm256_sqrt_pd(r_sqsum);
+
+	//top half of scalar gravitational force, part one
+	mass_focus = _mm256_set1_pd(oct->mass[focus]);
+	mass_comp  = _mm256_set1_pd(oct->mass[comp]);
+	g_vec      = _mm256_set1_pd(GRAV_CONST);
+	f_part     = _mm256_mul_pd(mass_focus, mass_comp);
+
+	f_focus    = _mm256_set_pd(oct->fma_x[focus], oct->fma_y[focus], oct->fma_z[focus], 0.0);
+	f_comp     = _mm256_set_pd(oct->fma_x[comp], oct->fma_y[comp], oct->fma_z[comp], 0.0);
+
+	//mul for r^3
+	r       = _mm256_mul_pd(r, _mm256_mul_pd(r, r));
+
+	//top half part 2
+	f_part  = _mm256_mul_pd(g_vec, f_part);
+
+	//divide even though divide is ugly
+	f_part  = _mm256_div_pd(f_part, r);
+
+	//  multiply to get vector forces
+	f_vec   = _mm256_mul_pd(f_part, r_vec);
+
+	//  do adds and subs for the fma results
+	//  result is fma_x, fma_y, fma_z, 0.0
+	f_focus = _mm256_add_pd(f_focus, f_vec);
+	f_comp  = _mm256_sub_pd(f_comp, f_vec);
+
+	// store results to fma_arrays
+	// storeu is probably slower than store, but we need it for this kind of routine
+	double fma_2_focus[4], fma_2_comp[4];  //know it's four wide because doubles
+
+	_mm256_storeu_pd(fma_2_focus, f_focus);
+	_mm256_storeu_pd(fma_2_comp,  f_comp);
+
+	oct->fma_x[focus] += fma_2_focus[0];
+	oct->fma_y[focus] += fma_2_focus[1];
+	oct->fma_z[focus] += fma_2_focus[2];
+
+	oct->fma_x[comp] -= fma_2_comp[0];
+	oct->fma_y[comp] -= fma_2_comp[1];
+	oct->fma_z[comp] -= fma_2_comp[2];
+
+	//  below seem to need AVX512 CPUID flags :(
+	// _mm256_mask_storeu_pd(oct->fma_x[focus], 0, f_focus);
+	// _mm256_mask_storeu_pd(oct->fma_y[focus], 1, f_focus);
+	// _mm256_mask_storeu_pd(oct->fma_z[focus], 2, f_focus);
+
+	// _mm256_mask_storeu_pd(oct->fma_x[comp], 0, f_comp);
+	// _mm256_mask_storeu_pd(oct->fma_y[comp], 1, f_comp);
+	// _mm256_mask_storeu_pd(oct->fma_z[comp], 2, f_comp);
+
+}
+#else
+		// VECTOR_ACTIVE not defined
 void 	body_body_force_accum(octant* oct, int focus, int comp)
 {
 	data_t r_x, r_y, r_z, r;
@@ -145,10 +224,11 @@ void 	body_body_force_accum(octant* oct, int focus, int comp)
 	oct->fma_y[focus] += F_y;
 	oct->fma_z[focus] += F_z;
 
-	oct->fma_x[comp] += -F_x;
-	oct->fma_y[comp] += -F_y;
-	oct->fma_z[comp] += -F_z;
+	oct->fma_x[comp] -= F_x;
+	oct->fma_y[comp] -= F_y;
+	oct->fma_z[comp] -= F_z;
 }
+#endif
 
 void 	body_octant_force_accum(octant* local, int leaf, octant* distal)
 {
@@ -189,19 +269,15 @@ void	force_accum(octant* root)
 			for(k = 0; k < leaf_count; k++)
 			{
 				for(m = k + 1; m < leaf_count; m++)
-					body_body_force_accum(local, k, m);
-
-				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);				
+						body_body_force_accum(local, k, m);
 
 				for(m = 0; m < CHILD_COUNT; m++)
 					if(m != j)body_octant_force_accum(local, k, root->children[i]->children[m]);
 
-				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);				
 
 				for(m = 0; m < CHILD_COUNT; m++)
 					if(m != i)body_octant_force_accum(local, k, root->children[m]);
 
-				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);
 			}
 		}
 }
@@ -266,3 +342,17 @@ void	velocity_update(octant* root, int timestep)
 			}
 		}
 }
+
+
+#ifdef VECTOR_ACTIVE
+void 	position_update_vec()
+{
+
+}
+
+void 	velocity_update_vec()
+{
+
+}
+#endif 
+		// VECTOR_ACTIVE
