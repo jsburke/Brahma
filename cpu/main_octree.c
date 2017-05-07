@@ -158,12 +158,11 @@ int main(int argc, char *argv[])
 				return 0;
 			}
 
-			force_zero(root);
-
 			#ifdef TEST_PRINT
 				printf("Body %d in octant(%d, %d) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", TEST_LEAF, TEST_MAJOR, TEST_MINOR, test->mass[TEST_LEAF], test->pos_x[TEST_LEAF], test->pos_y[TEST_LEAF], test->pos_z[TEST_LEAF]);
 			#endif
 
+			force_zero(root);
 			center_of_mass_update(root);
 			force_accum(root);
 			position_update(root);		
