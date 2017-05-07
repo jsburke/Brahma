@@ -1,11 +1,11 @@
 #include "cpu_octree.h"
 
 const	data_t GRAV_CONST = 6.674e-11;
-const 	data_t HALF_TIME, TIME;
+data_t 		   HALF_TIME, TIME;
 
 #define LINE_LEN			512
 
-void	time_set_up(timestep)
+void	time_set_up(data_t timestep)
 {
 	HALF_TIME = 0.5 * timestep;
 	TIME 	  = timestep;
@@ -236,9 +236,9 @@ void	position_update(octant* root)
 				local->fma_z[k]  /= mass;
 
 				
-				local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], timestep);
-				local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], timestep);
-				local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], timestep);
+				local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], TIME, HALF_TIME);
+				local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], TIME, HALF_TIME);
+				local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], TIME, HALF_TIME);
 
 			}
 		}
@@ -261,9 +261,9 @@ void	velocity_update(octant* root)
 
 			for(k = 0; k < leaf_count; k++)
 			{
-				local->vel_x[k]	 += local->fma_x[k] * timestep;
-				local->vel_y[k]	 += local->fma_y[k] * timestep;
-				local->vel_z[k]	 += local->fma_z[k] * timestep;
+				local->vel_x[k]	 += local->fma_x[k] * TIME;
+				local->vel_y[k]	 += local->fma_y[k] * TIME;
+				local->vel_z[k]	 += local->fma_z[k] * TIME;
 			}
 		}
 }
