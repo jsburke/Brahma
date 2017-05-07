@@ -23,3 +23,5 @@ midpoint inclusive to higher value octant
 CPE = (cyc/sec)*(sec/ns)*(ns/iter)
       ----------------------------
            (elements/iteration)
+
+since in displacement the 0.5*a*t portion always has 0.5*t as a constant value, we can precalculate it to save three multiplications per object per iteration.
