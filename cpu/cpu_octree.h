@@ -17,13 +17,7 @@
 
 #ifdef THREAD_ACTIVE
 	#include <omp.h>
-	#define NUM_THREADS		32
-#endif
-
-#ifdef VECTOR_ACTIVE
-	#include <immintrin.h>
-	#include <xmmintrin.h>
-	#include <smmintrin.h>
+	#define NUM_THREADS		4
 #endif
 
 //  Functions & Macros for the math that will be needed
@@ -41,7 +35,5 @@ void	force_accum(octant* root);
 
 void	position_update(octant* root);
 void	velocity_update(octant* root);
-
-
 
 #endif

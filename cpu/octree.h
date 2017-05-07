@@ -33,15 +33,8 @@ typedef double data_t;
 #define POS_QUARTER_MARK	POSITION_MAX_POS/2.0 // use 2.0 for float and double data_t
 #define NEG_QUARTER_MARK 	-POS_QUARTER_MARK
 
-//  vector for align data
-
-#ifdef VECTOR_ACTIVE
-	#include <mm_malloc.h>
-	#define ALIGN 				32
-	#define ALLOC(capacity, req_sz) _mm_malloc(capacity * req_sz, ALIGN)
-#else
+//  hangover from vector trials, may be worthwhile for future generalizations
 	#define ALLOC(capacity, req_sz) calloc(capacity, req_sz) 
-#endif
 
 //  octant struct and functions
 
