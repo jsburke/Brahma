@@ -36,6 +36,8 @@
 	#define TARGET_FILE ((const char*) "results.csv")
 #endif
 
+void payload_calculations(octant *root);  //mainly used to help parallelism
+
 ////////////////////////////////////////////////////////////////////
 //
 // Inputs: a file name of the form galaxy_###.csv, where the number
@@ -162,11 +164,7 @@ int main(int argc, char *argv[])
 				printf("Body %d in octant(%d, %d) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", TEST_LEAF, TEST_MAJOR, TEST_MINOR, test->mass[TEST_LEAF], test->pos_x[TEST_LEAF], test->pos_y[TEST_LEAF], test->pos_z[TEST_LEAF]);
 			#endif
 
-			force_zero(root);
-			center_of_mass_update(root);
-			force_accum(root);
-			position_update(root);		
-			velocity_update(root);
+			payload_calculations(root);
 
 			#ifdef TIMING_ACTIVE
 				#ifdef CPE_ACTIVE
@@ -204,4 +202,13 @@ int main(int argc, char *argv[])
 	#endif
 
 	return 0;
+}
+
+void payload_calculations(octant *root)
+{
+	force_zero(root);
+	center_of_mass_update(root);
+	force_accum(root);
+	position_update(root);		
+	velocity_update(root);
 }
