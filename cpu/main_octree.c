@@ -206,9 +206,17 @@ int main(int argc, char *argv[])
 
 void payload_calculations(octant *root)
 {
-	force_zero(root);
-	center_of_mass_update(root);
-	force_accum(root);
-	position_update(root);		
-	velocity_update(root);
+	int i;
+
+	#ifdef THREAD_ACTIVE
+		#pragma omp parallel for
+	#endif
+	for(i = 0; i < CHILD_COUNT; i++)
+	{
+		force_zero(root);
+		force_accum(root);
+		position_update(root);		
+		velocity_update(root);
+		center_of_mass_update(root);
+	}
 }
