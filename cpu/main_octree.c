@@ -142,36 +142,39 @@ int main(int argc, char *argv[])
 		clock_gettime(TIMING_MODE, &total_start);
 	#endif
 
-		for(i = 0; i < EXIT_COUNT; i++)
+	center_of_mass_update(root);
+
+	for(i = 0; i < EXIT_COUNT; i++)
+	{
+		#ifdef TIMING_ACTIVE
+			#ifdef CPE_ACTIVE
+				clock_gettime(TIMING_MODE, &iter_start[i]);
+			#endif
+		#endif
+
+		//printf("iter: %d\n\n", i);
+		if((i % REBUILD_FREQ) == 0)
+			check = octree_rebuild(root);
+
+		if(!check)
 		{
-			#ifdef TIMING_ACTIVE
-				#ifdef CPE_ACTIVE
-					clock_gettime(TIMING_MODE, &iter_start[i]);
-				#endif
-			#endif
-
-			//printf("iter: %d\n\n", i);
-			if((i % REBUILD_FREQ) == 0)
-				check = octree_rebuild(root);
-
-			if(!check)
-			{
-				printf("ERROR: Octree Rebuild caused error, iteration %d\n", i);
-				return 0;
-			}
-
-			#ifdef TEST_PRINT
-				printf("Body %d in octant(%d, %d) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", TEST_LEAF, TEST_MAJOR, TEST_MINOR, test->mass[TEST_LEAF], test->pos_x[TEST_LEAF], test->pos_y[TEST_LEAF], test->pos_z[TEST_LEAF]);
-			#endif
-
-			payload_calculations(root);
-
-			#ifdef TIMING_ACTIVE
-				#ifdef CPE_ACTIVE
-					clock_gettime(TIMING_MODE, &iter_end[i]);
-				#endif
-			#endif
+			printf("ERROR: Octree Rebuild caused error, iteration %d\n", i);
+			return 0;
 		}
+
+		#ifdef TEST_PRINT
+			printf("Body %d in octant(%d, %d) has mass %.2lf kg and is at position (%.2lf, %.2lf, %.2lf).\n", TEST_LEAF, TEST_MAJOR, TEST_MINOR, test->mass[TEST_LEAF], test->pos_x[TEST_LEAF], test->pos_y[TEST_LEAF], test->pos_z[TEST_LEAF]);
+		#endif
+
+		payload_calculations(root);
+		center_of_mass_update(root);  // can try to parallelize later
+
+		#ifdef TIMING_ACTIVE
+			#ifdef CPE_ACTIVE
+				clock_gettime(TIMING_MODE, &iter_end[i]);
+			#endif
+		#endif
+	}
 
 	#ifdef TIMING_ACTIVE
 		clock_gettime(TIMING_MODE, &total_end);
@@ -213,10 +216,10 @@ void payload_calculations(octant *root)
 	#endif
 	for(i = 0; i < CHILD_COUNT; i++)
 	{
-		force_zero(root);
-		force_accum(root);
-		position_update(root);		
-		velocity_update(root);
-		center_of_mass_update(root);
+		force_zero(root, i);
+		force_accum(root, i);
+		position_update(root, i);		
+		velocity_update(root, i);
+		//center_of_mass_update(root);
 	}
 }
