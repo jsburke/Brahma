@@ -25,3 +25,9 @@ CPE = (cyc/sec)*(sec/ns)*(ns/iter)
            (elements/iteration)
 
 since in displacement the 0.5*a*t portion always has 0.5*t as a constant value, we can precalculate it to save three multiplications per object per iteration.
+
+===============================
+===============================
+===============================
+
+intrinsics on position and velocity updates are a bust because of cache issues I think.  Velocity update vectorized with intrinsics is a hair slower.  However, part of the reason for this is the fact that three must be used for each update of four.  If we had direct access to _mm256_fmadd_pd() we would likely be able to beat the non-vectorized time, but the current situation doesn't give us access that intrinsic.  since _mm256_add_pd() and _mm256_mul_pd() both have latency of around 4-5 cycles, and _mm256_fmadd_pd() is 5-6, with the undesirable round off error it would accrue, the fused multiply add operation would likely get enough speed up to be worthwhile.
