@@ -23,11 +23,6 @@ if (-e $oct) {
   unlink($oct);
 }
 
-$oct_vec = "./OCTREE_VEC";
-if (-e $oct) {
-  unlink($oct_vec);
-}
-
 $octomp = "./OCTREE_OMP";
 if (-e $octomp) {
   unlink($octomp);
@@ -43,10 +38,6 @@ if (!(-x $n2n)) {
 }
 
 if (!(-x $oct)) {
-  die "$myname: No binary $oct, compile error?\n";
-}
-
-if (!(-x $oct_vec)) {
   die "$myname: No binary $oct, compile error?\n";
 }
 
@@ -94,16 +85,6 @@ foreach $count(@objectCounts)
 {
 	print "OCTREE $count:\n";
 	system("$oct galaxy_$count.csv");
-	print "\n";
-}
-
-open($fp, '>>', $file) or die "perl failed to open $file for Octree Vector.";
-print $fp "\nOctree Vector, ";
-close $fp;
-foreach $count(@objectCounts)
-{
-	print "OCTREE $count:\n";
-	system("$oct_vec galaxy_$count.csv");
 	print "\n";
 }
 
