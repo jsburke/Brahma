@@ -22,6 +22,8 @@
 
 #ifdef VECTOR_ACTIVE
 	#include <immintrin.h>
+	#include <xmmintrin.h>
+	#include <smmintrin.h>
 #endif
 
 //  Functions & Macros for the math that will be needed

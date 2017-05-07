@@ -3,12 +3,20 @@
 const	data_t GRAV_CONST = 6.674e-11;
 data_t 		   HALF_TIME, TIME;
 
+#ifdef VECTOR_ACTIVE
+	__m256d   MM_TIME;
+#endif
+
 #define LINE_LEN			512
 
 void	time_set_up(data_t timestep)
 {
 	HALF_TIME = 0.5 * timestep;
 	TIME 	  = timestep;
+
+	#ifdef VECTOR_ACTIVE
+		MM_TIME = _mm256_set1_pd(TIME);
+	#endif
 }
 
 int		body_count(char* filename)
@@ -259,12 +267,60 @@ void	velocity_update(octant* root)
 			octant* local = root->children[i]->children[j];
 			leaf_count    = local->leaf_count;
 
-			for(k = 0; k < leaf_count; k++)
-			{
-				local->vel_x[k]	 += local->fma_x[k] * TIME;
-				local->vel_y[k]	 += local->fma_y[k] * TIME;
-				local->vel_z[k]	 += local->fma_z[k] * TIME;
-			}
+			#ifdef VECTOR_ACTIVE
+				int vec_loop_sz = leaf_count/4;
+				__m256d *mm_vel_x, *mm_vel_y, *mm_vel_z;
+				__m256d *mm_fma_x, *mm_fma_y, *mm_fma_z;
+				__m256d mm_temp_x, mm_temp_y, mm_temp_z;
+
+				mm_vel_x = (__m256d*) local->vel_x;
+				mm_vel_y = (__m256d*) local->vel_y;
+				mm_vel_z = (__m256d*) local->vel_z;
+
+				mm_fma_x = (__m256d*) local->fma_x;
+				mm_fma_y = (__m256d*) local->fma_y;
+				mm_fma_z = (__m256d*) local->fma_z;
+
+				for(k = 0; k < vec_loop_sz; k++)
+				{	
+					//_mm256_store_pd((data_t*) mm_vel_x, _mm256_fmadd_pd(MM_TIME, mm_fma_x, mm_vel_x));
+					//*mm_vel_x = _mm256_fmadd_pd(MM_TIME, *mm_fma_x, *mm_vel_x);
+					//*mm_vel_y = _mm256_fmadd_pd(MM_TIME, *mm_fma_y, *mm_vel_y);
+					//*mm_vel_z = _mm256_fmadd_pd(MM_TIME, *mm_fma_z, *mm_vel_z);
+
+					mm_temp_x = _mm256_add_pd(_mm256_mul_pd(MM_TIME, *mm_fma_x), *mm_vel_x);
+					mm_temp_y = _mm256_add_pd(_mm256_mul_pd(MM_TIME, *mm_fma_y), *mm_vel_y);
+					mm_temp_z = _mm256_add_pd(_mm256_mul_pd(MM_TIME, *mm_fma_z), *mm_vel_z);
+
+					_mm256_store_pd((data_t*) mm_vel_x, mm_temp_x);
+					_mm256_store_pd((data_t*) mm_vel_y, mm_temp_y);
+					_mm256_store_pd((data_t*) mm_vel_z, mm_temp_z);
+
+					mm_vel_x++;
+					mm_vel_y++;
+					mm_vel_z++;
+					
+					mm_fma_x++;
+					mm_fma_y++;
+					mm_fma_z++;				
+				}
+
+				k *= 4;
+
+				for(; k < leaf_count; k++)  // clean up
+				{
+					local->vel_x[k]	 += local->fma_x[k] * TIME;
+					local->vel_y[k]	 += local->fma_y[k] * TIME;
+					local->vel_z[k]	 += local->fma_z[k] * TIME;
+				}
+			#else
+				for(k = 0; k < leaf_count; k++)
+				{
+					local->vel_x[k]	 += local->fma_x[k] * TIME;
+					local->vel_y[k]	 += local->fma_y[k] * TIME;
+					local->vel_z[k]	 += local->fma_z[k] * TIME;
+				}
+			#endif
 		}
 }
 
