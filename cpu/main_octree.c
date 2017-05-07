@@ -218,6 +218,9 @@ void payload_calculations(octant *root)
 	{
 		force_zero(root, i);
 		force_accum(root, i);
+		#ifdef THREAD_ACTIVE
+			#pragma omp barrier
+		#endif
 		position_update(root, i);		
 		velocity_update(root, i);
 		//center_of_mass_update(root);

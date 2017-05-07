@@ -30,10 +30,10 @@ void	time_set_up(data_t timestep);
 int 	body_count(char* filename);
 int 	fileread_build_tree(char* filename, octant *root, int len);
 
-void	force_zero(octant* root);
-void	force_accum(octant* root);
+void	force_zero(octant* root, int i);
+void	force_accum(octant* root, int i);
 
-void	position_update(octant* root);
-void	velocity_update(octant* root);
+void	position_update(octant* root, int i);
+void	velocity_update(octant* root, int i);
 
 #endif
