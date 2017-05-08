@@ -1,8 +1,14 @@
-TEST_PRINT    	 = off
-TIMING_ACTIVE 	 = on
-CPE_ACTIVE    	 = off
-CSV_ACTIVE	  	 = off
-VALGRIND_ACTIVE  = off
+DEFAULT_TIME_STEP  = off
+DEFAULT_EXIT_COUNT = off
+
+TIME_STEP          = -DTIME_STEP=5*TIME_HOUR
+EXIT_COUNT         = -DEXIT_COUNT=100
+
+TEST_PRINT    	   = off
+TIMING_ACTIVE 	   = on
+CPE_ACTIVE    	   = off
+CSV_ACTIVE	  	   = on
+VALGRIND_ACTIVE    = off
 
 CC = gcc
 OPT = -O3
@@ -38,6 +44,16 @@ endif
 ifeq ($(CSV_ACTIVE), on)
 	THREAD_DEFINES += -DCSV_ACTIVE
 	SERIAL_DEFINES += -DCSV_ACTIVE
+endif
+
+ifeq ($(DEFAULT_TIME_STEP), off)
+	THREAD_DEFINES += $(TIME_STEP)
+	SERIAL_DEFINES += $(TIME_STEP)
+endif
+
+ifeq ($(DEFAULT_EXIT_COUNT), off)
+	THREAD_DEFINES += $(EXIT_COUNT)
+	SERIAL_DEFINES += $(EXIT_COUNT)
 endif
 
 ifeq ($(VALGRIND_ACTIVE), on)

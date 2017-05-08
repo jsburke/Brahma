@@ -4,7 +4,9 @@
 #include "cpu_n2n.h"
 
 //  Time based defines
-#define TIME_STEP				3*TIME_DAY  //time step to be used for calculations
+#ifndef TIME_STEP
+	#define TIME_STEP			3*TIME_HOUR  //time step to be used for calculations
+#endif
 //  General use
 #define TIME_MIN 				60			// lowest granualarity is second
 #define TIME_HOUR				60*TIME_MIN
@@ -12,7 +14,10 @@
 #define TIME_MONTH				30*TIME_DAY
 #define TIME_YEAR				365*TIME_DAY
 
-#define EXIT_COUNT				200			//  number of iterations in loop
+#ifndef EXIT_COUNT
+	#define EXIT_COUNT			200			//  number of iterations in loop
+#endif
+
 #define FILENAME_LEN			256
 
 #define TIMING_ACTIVE			1 			//  comment me out to disable timing in compile
