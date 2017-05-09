@@ -69,14 +69,14 @@ print "  BEGIN EXECUTION \n\n";
 # run a series of tests
 # harvest data
 
-# print $fp "Brute Force, ";
-# close $fp;
-# foreach $count(@objectCounts)
-# {
-# 	print "N2N $count:\n";
-# 	system("$n2n galaxy_$count.csv");
-# 	print "\n";
-# }
+print $fp "Brute Force, ";
+close $fp;
+foreach $count(@objectCounts)
+{
+	print "N2N $count:\n";
+	system("$n2n galaxy_$count.csv");
+	print "\n";
+}
 
 open($fp, '>>', $file) or die "perl failed to open $file for Octree.";
 print $fp "\nOctree, ";
