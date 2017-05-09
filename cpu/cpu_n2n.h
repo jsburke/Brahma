@@ -24,7 +24,7 @@ typedef double data_t;
 #define FORCE_PARTIAL(g, m1, m2, r) g*((m1 * m2)/(r * r * r))
 
 // NB : expansion below is one MUL less than direct implementation
-#define DISPLACE(vel, accel, time) time * (vel + (0.5 * accel * time))
+#define DISPLACE(vel, accel, time) (time * vel) + (0.5 * accel * time * time)
 
 int 	body_count(char* filename);  //const char* ???
 

@@ -148,8 +148,8 @@ int main(int argc, char *argv[])
 
 		for(j = 0; j < num_bodies; j++)
 		{
-			for(k = j + 1; k < num_bodies; k++)
-				force_accum(mass, pos_x, pos_y, pos_z, fma_x, fma_y, fma_z, j, k);
+			for(k = 0; k < num_bodies; k++)
+				if(j != k) force_accum(mass, pos_x, pos_y, pos_z, fma_x, fma_y, fma_z, j, k);
 		}
 
 		position_update(mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z, fma_x, fma_y, fma_z, num_bodies, TIME_STEP);
