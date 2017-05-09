@@ -1,13 +1,13 @@
 DEFAULT_TIME_STEP  = off
 DEFAULT_EXIT_COUNT = off
 
-TIME_STEP          = -DTIME_STEP=5*TIME_HOUR
-EXIT_COUNT         = -DEXIT_COUNT=100
+ITERS			   = 100
+TIME 			   = 5*TIME_HOUR
 
 TEST_PRINT    	   = off
 TIMING_ACTIVE 	   = on
 CPE_ACTIVE    	   = off
-CSV_ACTIVE	  	   = on
+CSV_ACTIVE	  	   = off
 VALGRIND_ACTIVE    = off
 
 CC = gcc
@@ -23,6 +23,9 @@ OCT_OBJS = cpu_octree.o octree.o timing.o
 
 OCT_OMP = OCTREE_OMP
 OCT_OMP_OBJS = cpu_octree_omp.o octree.o timing.o
+
+TIME_STEP          = -DTIME_STEP=$(TIME)
+EXIT_COUNT         = -DEXIT_COUNT=$(ITERS)
 
 THREAD_DEFINES = -DTHREAD_ACTIVE
 
