@@ -217,65 +217,62 @@ int			octree_rebuild(octant* root)
 		return 1;
 }
 
-void 		center_of_mass_update(octant* root)
+void 		center_of_mass_update(octant* root, int i)
 {
-	int 	i, j, k, leaf_count;
+	int 	j, k, leaf_count;
 	octant* local;
 
 	data_t mass_accum, x_accum, y_accum, z_accum;
 	data_t mass_accum_L1, x_accum_L1, y_accum_L1, z_accum_L1;
 
-	for(i = 0; i < CHILD_COUNT; i++)
+	mass_accum_L1   = 0;
+	x_accum_L1		= 0;
+	y_accum_L1		= 0;
+	z_accum_L1		= 0;
+
+	for(j = 0; j < CHILD_COUNT; j++)
 	{
-		mass_accum_L1   = 0;
-		x_accum_L1		= 0;
-		y_accum_L1		= 0;
-		z_accum_L1		= 0;
+		local 		= root->children[i]->children[j];
+		leaf_count 	= local->leaf_count;
 
-		for(j = 0; j < CHILD_COUNT; j++)
+		mass_accum  = 0;
+		x_accum		= 0;
+		y_accum		= 0;
+		z_accum		= 0;
+
+		for(k = 0; k < leaf_count; k++)
 		{
-			local 		= root->children[i]->children[j];
-			leaf_count 	= local->leaf_count;
-
-			mass_accum  = 0;
-			x_accum		= 0;
-			y_accum		= 0;
-			z_accum		= 0;
-
-			for(k = 0; k < leaf_count; k++)
-			{
-				mass_accum	 += local->mass[k];
-				x_accum      += (local->pos_x[i] * local->mass[i]);
-				y_accum      += (local->pos_y[i] * local->mass[i]);
-				z_accum      += (local->pos_z[i] * local->mass[i]);
-			}
-
-			//printf("Center of mass (%d, %d) -- %.3lf kg (%.4lf, %.4lf, %.4lf)\n", i, j, mass_accum, x_accum, y_accum, z_accum);
-
-			local->mass_total 	 = mass_accum;
-			local->mass_center_x = x_accum/mass_accum;
-			local->mass_center_y = y_accum/mass_accum;
-			local->mass_center_z = z_accum/mass_accum;
-
-			// do stuff for higher level while here
-			mass_accum_L1   += mass_accum;
-			x_accum_L1		+= local->mass_center_x;
-			y_accum_L1		+= local->mass_center_y;
-			z_accum_L1		+= local->mass_center_z;
-				
+			mass_accum	 += local->mass[k];
+			x_accum      += (local->pos_x[i] * local->mass[i]);
+			y_accum      += (local->pos_y[i] * local->mass[i]);
+			z_accum      += (local->pos_z[i] * local->mass[i]);
 		}
 
-		//Level 1 calculations
+		//printf("Center of mass (%d, %d) -- %.3lf kg (%.4lf, %.4lf, %.4lf)\n", i, j, mass_accum, x_accum, y_accum, z_accum);
 
-		//printf("Center of mass (%d) -- %.3lf kg (%.4lf, %.4lf, %.4lf)\n", i, mass_accum_L1, x_accum_L1, y_accum_L1, z_accum_L1);
+		local->mass_total 	 = mass_accum;
+		local->mass_center_x = x_accum/mass_accum;
+		local->mass_center_y = y_accum/mass_accum;
+		local->mass_center_z = z_accum/mass_accum;
 
-		local = root->children[i];
-
-		local->mass_total 	 = mass_accum_L1;
-		local->mass_center_x = x_accum_L1/mass_accum_L1;
-		local->mass_center_y = y_accum_L1/mass_accum_L1;
-		local->mass_center_z = z_accum_L1/mass_accum_L1;
+		// do stuff for higher level while here
+		mass_accum_L1   += mass_accum;
+		x_accum_L1		+= local->mass_center_x;
+		y_accum_L1		+= local->mass_center_y;
+		z_accum_L1		+= local->mass_center_z;
+			
 	}
+
+	//Level 1 calculations
+
+	//printf("Center of mass (%d) -- %.3lf kg (%.4lf, %.4lf, %.4lf)\n", i, mass_accum_L1, x_accum_L1, y_accum_L1, z_accum_L1);
+
+	local = root->children[i];
+
+	local->mass_total 	 = mass_accum_L1;
+	local->mass_center_x = x_accum_L1/mass_accum_L1;
+	local->mass_center_y = y_accum_L1/mass_accum_L1;
+	local->mass_center_z = z_accum_L1/mass_accum_L1;
 }
 
 pair 		octant_locate(data_t x, data_t y, data_t z)

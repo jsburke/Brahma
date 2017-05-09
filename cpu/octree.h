@@ -77,7 +77,7 @@ typedef struct pair  // for parent - child relations
 octant*		octant_new(int lvl);
 int			octree_rebuild(octant* root);
 
-void 		center_of_mass_update(octant* root);
+void 		center_of_mass_update(octant* root, int i);
 
 pair 		octant_locate(data_t x, data_t y, data_t z);
 int 		octant_add_body(octant* root, int major, int minor, data_t mass, data_t pos_x, data_t pos_y, data_t pos_z, data_t vel_x, data_t vel_y, data_t vel_z);

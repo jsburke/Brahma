@@ -147,7 +147,8 @@ int main(int argc, char *argv[])
 		clock_gettime(TIMING_MODE, &total_start);
 	#endif
 
-	center_of_mass_update(root);
+	for(i = 0; i < CHILD_COUNT; i++)
+		center_of_mass_update(root, i);
 
 	for(i = 0; i < EXIT_COUNT; i++)
 	{
@@ -172,7 +173,7 @@ int main(int argc, char *argv[])
 		#endif
 
 		payload_calculations(root);
-		center_of_mass_update(root);  // can try to parallelize later
+		//center_of_mass_update(root);  // can try to parallelize later
 
 		#ifdef TIMING_ACTIVE
 			#ifdef CPE_ACTIVE
@@ -228,6 +229,6 @@ void payload_calculations(octant *root)
 		#endif
 		position_update(root, i);		
 		velocity_update(root, i);
-		//center_of_mass_update(root);
+		center_of_mass_update(root, i);
 	}
 }
