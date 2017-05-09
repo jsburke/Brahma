@@ -7,7 +7,7 @@ TIME 			   = 5*TIME_HOUR
 TEST_PRINT    	   = off
 TIMING_ACTIVE 	   = on
 CPE_ACTIVE    	   = off
-CSV_ACTIVE	  	   = off
+CSV_ACTIVE	  	   = on
 VALGRIND_ACTIVE    = off
 
 CC = gcc
