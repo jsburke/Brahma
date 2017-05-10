@@ -24,7 +24,6 @@
 
 #define FILENAME_LEN	 	256
 #define NUM_THREADS			64
-#define NUM_BLOCKS			16
 #define TOL					0.5
 #define GIG 				1000000000
 #define MI 					1000000
@@ -67,7 +66,7 @@ int 	body_count(char* filename);  //const char* ???
 	void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len, int time);
 	void	velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len, int time);
 #endif
-	
+
 int 	fileread_build_arrays(char* filename, data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, int len);
 
 
@@ -133,12 +132,13 @@ int main(int argc, char *argv[]){
 	}
 
 	filename = argv[1];
-	num_bodies = body_count(filename);	
+	num_bodies = body_count(filename);
+	int NUM_BLOCKS = num_bodies/NUM_THREADS;
 
-	printf("Num bodies: %d\n", num_bodies);
+	//printf("Num bodies: %d\n", num_bodies);
 	// total size required for allocation
 	allocSize = sizeof(data_t) * num_bodies;
-	printf("Allocating memory on host\n");
+	//printf("Allocating memory on host\n");
 	// Allocate memory on CPU
 	h_mass  = (data_t*) malloc(allocSize);
 	h_pos_x = (data_t*) malloc(allocSize);
@@ -156,21 +156,14 @@ int main(int argc, char *argv[]){
 		printf("ERROR: Array malloc issue!\n");
 		return 0;
 	}
-	printf("Done!\n");
-
 	
-	// read the file
-	printf("Reading file and building arrays...\n");
+
 	fileread_build_arrays(filename, h_mass, h_pos_x, h_pos_y, h_pos_z, h_vel_x, h_vel_y, h_vel_z, num_bodies);
-	//printf("%lf\n",h_pos_x[4]);	
-	printf("Done!\n");
-	//accelerations
-	//force_zero(h_fma_x, h_fma_y, h_fma_z, num_bodies); 
 
 	// Select GPU
     CUDA_SAFE_CALL(cudaSetDevice(0));
 	
-	printf("Allocating memory on GPU...\n");	
+	//printf("Allocating memory on GPU...\n");	
 	//Allocate memory on GPU
 	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_mass, allocSize));	
 	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_pos_x, allocSize));
@@ -182,7 +175,7 @@ int main(int argc, char *argv[]){
 	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_fma_x, allocSize));
 	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_fma_y, allocSize));
 	CUDA_SAFE_CALL(cudaMalloc((data_t**)&d_fma_z, allocSize));
-	printf("Done!\n");
+	//printf("Done!\n");
 
 	// Create the cuda events
 	cudaEventCreate(&start);
@@ -192,7 +185,7 @@ int main(int argc, char *argv[]){
 	// Record event on the default stream
 	cudaEventRecord(start, 0);
 
-	printf("Copying data on GPU...\n");
+	//printf("Copying data on GPU...\n");
 	//Transfer the data to GPU memory
 	CUDA_SAFE_CALL(cudaMemcpy(d_mass, h_mass, allocSize, cudaMemcpyHostToDevice));
 	CUDA_SAFE_CALL(cudaMemcpy(d_pos_x, h_pos_x, allocSize, cudaMemcpyHostToDevice));
@@ -204,15 +197,14 @@ int main(int argc, char *argv[]){
 	CUDA_SAFE_CALL(cudaMemcpy(d_fma_x, h_fma_x, allocSize, cudaMemcpyHostToDevice));
 	CUDA_SAFE_CALL(cudaMemcpy(d_fma_y, h_fma_y, allocSize, cudaMemcpyHostToDevice));
 	CUDA_SAFE_CALL(cudaMemcpy(d_fma_z, h_fma_z, allocSize, cudaMemcpyHostToDevice));
-	printf("Done!\n");
+	//printf("Done!\n");
 
 	// Launch the kernel
-    	dim3 dimBlock(NUM_THREADS, 1, 1);
-	printf("dimBlock\n");
+    dim3 dimBlock(NUM_THREADS, 1, 1);
+	//printf("dimBlock\n");
 	dim3 dimGrid(NUM_BLOCKS, 1, 1);
-	printf("dimGrid\n");
+	//printf("dimGrid\n");
 
-	//kernel_force_zero<<<dimGrid, dimBlock>>>(h_fma_x, h_fma_y, h_fma_z, num_bodies);
 	cudaEventRecord(start1, 0);
 
 	for(i = 0; i < EXIT_COUNT; i++)
@@ -222,12 +214,12 @@ int main(int argc, char *argv[]){
 		kernel_force_accum<<<dimGrid, dimBlock>>>(d_mass, d_pos_x, d_pos_y, d_pos_z, d_vel_x, d_vel_y, d_vel_z, d_fma_x, d_fma_y, d_fma_z, num_bodies, TIME_STEP);
 		kernel_position_update<<<dimGrid, dimBlock>>>(d_mass, d_pos_x, d_pos_y, d_pos_z, d_vel_x, d_vel_y, d_vel_z, d_fma_x, d_fma_y, d_fma_z, num_bodies, TIME_STEP);
 		kernel_velocity_update<<<dimGrid, dimBlock>>>(d_mass, d_vel_x, d_vel_y, d_vel_z, d_fma_x, d_fma_y, d_fma_z, num_bodies, TIME_STEP);
-		
 	}
 
 	CUDA_SAFE_CALL(cudaPeekAtLastError());
 
 	CUDA_SAFE_CALL(cudaMemcpy(h_result, d_pos_x, allocSize, cudaMemcpyDeviceToHost));
+	printf("hi hi\n");
 
 	//printf("kernel call done\n");
 	cudaEventRecord(stop1,0);
@@ -284,6 +276,8 @@ int main(int argc, char *argv[]){
 		printf("\nTEST PASSED: All results matched\n");
 
 	#endif
+
+	return 0;
 }
 
 
