@@ -1,26 +1,5 @@
 #include "grav_gpu.hu"
 
-inline void gpuAssert(cudaError_t code, char *file, int line, bool abort=true)
-{
-	if (code != cudaSuccess) 
-	{
-		fprintf(stderr,"CUDA_SAFE_CALL: %s %s %d\n", cudaGetErrorString(code), file, line);
-		if (abort) exit(code);
-	}
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-struct timespec diff(struct timespec start, struct timespec end){
-  struct timespec temp;
-  if ((end.tv_nsec-start.tv_nsec)<0) {
-    temp.tv_sec = end.tv_sec-start.tv_sec-1;
-    temp.tv_nsec = 1000000000+end.tv_nsec-start.tv_nsec;
-  } else {
-    temp.tv_sec = end.tv_sec-start.tv_sec;
-    temp.tv_nsec = end.tv_nsec-start.tv_nsec;
-  }
-  return temp;
-}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 __global__ void kernel_force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time){
 
@@ -55,8 +34,7 @@ __global__ void kernel_force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, d
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 __global__ void kernel_force_zero(data_t* x, data_t* y, data_t* z, int len){
-	int i;
-int idx = (blockIdx.x * blockDim.x + threadIdx.x);
+	int idx = (blockIdx.x * blockDim.x + threadIdx.x);
 	//for(i = 0; i < len; i++)
 	//{
 		x[idx] = 0;
@@ -84,16 +62,5 @@ __global__ void kernel_velocity_update(data_t* mass, data_t* vel_x, data_t* vel_
 		vel_x[i] += fma_x[i] * time;
 		vel_y[i] += fma_y[i] * time;
 		vel_z[i] += fma_z[i] * time;
-	}
-}
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void force_zero(data_t* x, data_t* y, data_t* z, int len){
-	int i;
-
-	for(i = 0; i < len; i++)
-	{
-		x[i] = 0;
-		y[i] = 0;
-		z[i] = 0;
 	}
 }

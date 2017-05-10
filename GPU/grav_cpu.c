@@ -41,13 +41,13 @@ void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data
 	r_y = pos_y[focus] - pos_y[comp];
 	r_z = pos_z[focus] - pos_z[comp];
 
-	r = DISTANCE(r_x, r_y, r_z);
+	r = SQRT((r_x * r_x) + (r_y * r_y) + (r_z * r_z));
 
 	//  then the force for the focus
 
 	data_t F_part;
 
-	F_part = FORCE_PARTIAL(GRAV_CONST, mass[focus], mass[comp], r);
+	F_part = (GRAV_CONST * mass[focus] * mass[comp])/(r * r * r);
 
 	fma_x[focus]  += F_part * r_x;
 	fma_y[focus]  += F_part * r_y;
@@ -67,9 +67,9 @@ void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, 
 		fma_y[i] /= mass[i];
 		fma_z[i] /= mass[i];
 
-		pos_x[i] += DISPLACE(vel_x[i], fma_x[i], time);
-		pos_y[i] += DISPLACE(vel_y[i], fma_y[i], time);
-		pos_z[i] += DISPLACE(vel_z[i], fma_z[i], time);
+		pos_x[i] += time * (vel_x[i] + (0.5 * fma_x[i] * time)); 
+		pos_y[i] += time * (vel_y[i] + (0.5 * fma_y[i] * time)); 
+		pos_z[i] += time * (vel_z[i] + (0.5 * fma_z[i] * time)); 
 	}
 }
 
