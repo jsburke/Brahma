@@ -49,8 +49,6 @@ void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data
 
 	F_part = FORCE_PARTIAL(GRAV_CONST, mass[focus], mass[comp], r);
 
-	//printf("F_part %lf | m1 %.2lf kg | m2 %.2lf kg | r %.2lf km\n", F_part, mass[focus], mass[comp], r);
-
 	fma_x[focus]  += F_part * r_x;
 	fma_y[focus]  += F_part * r_y;
 	fma_z[focus]  += F_part * r_z;
