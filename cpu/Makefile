@@ -1,3 +1,15 @@
+DEFAULT_TIME_STEP  = off
+DEFAULT_EXIT_COUNT = off
+
+ITERS			   = 100
+TIME 			   = 5*TIME_HOUR
+
+TEST_PRINT    	   = off
+TIMING_ACTIVE 	   = on
+CPE_ACTIVE    	   = off
+CSV_ACTIVE	  	   = on
+VALGRIND_ACTIVE    = off
+
 CC = gcc
 OPT = -O3
 FLAGS = -Wall
@@ -12,10 +24,8 @@ OCT_OBJS = cpu_octree.o octree.o timing.o
 OCT_OMP = OCTREE_OMP
 OCT_OMP_OBJS = cpu_octree_omp.o octree.o timing.o
 
-TEST_PRINT    = off
-TIMING_ACTIVE = on
-CPE_ACTIVE    = on
-CSV_ACTIVE	  = on
+TIME_STEP          = -DTIME_STEP=$(TIME)
+EXIT_COUNT         = -DEXIT_COUNT=$(ITERS)
 
 THREAD_DEFINES = -DTHREAD_ACTIVE
 
@@ -39,6 +49,19 @@ ifeq ($(CSV_ACTIVE), on)
 	SERIAL_DEFINES += -DCSV_ACTIVE
 endif
 
+ifeq ($(DEFAULT_TIME_STEP), off)
+	THREAD_DEFINES += $(TIME_STEP)
+	SERIAL_DEFINES += $(TIME_STEP)
+endif
+
+ifeq ($(DEFAULT_EXIT_COUNT), off)
+	THREAD_DEFINES += $(EXIT_COUNT)
+	SERIAL_DEFINES += $(EXIT_COUNT)
+endif
+
+ifeq ($(VALGRIND_ACTIVE), on)
+	FLAGS += -g
+endif
 
 all: n2n octree octree_omp
 
@@ -49,7 +72,7 @@ octree: main_octree.c cpu_octree.o octree.o timing.o
 	$(CC) $(OPT) $(FLAGS) main_octree.c $(OCT_OBJS) -o $(OCT) $(LINK) $(SERIAL_DEFINES)
 
 octree_omp: main_octree.c cpu_octree_omp.o octree.o timing.o
-	$(CC) $(OPT) $(FLAGS) -fopenmp main_octree.c $(OCT_OMP_OBJS) -o $(OCT_OMP) $(LINK) $(THREAD_DEFINES)
+	$(CC) $(OPT) $(FLAGS) $(INTEL) -fopenmp main_octree.c $(OCT_OMP_OBJS) -o $(OCT_OMP) $(LINK) $(THREAD_DEFINES)
 
 cpu_n2n.o: cpu_n2n.c
 	$(CC) $(OPT) $(FLAGS) -c cpu_n2n.c
@@ -69,4 +92,4 @@ timing.o: timing.c
 rebuild: clean all
 
 clean:
-	rm *.o $(N2N) $(OCT) $(OCT_OMP)
+	rm *.o $(N2N) $(OCT) $(OCT_VEC) $(OCT_OMP)

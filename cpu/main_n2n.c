@@ -4,7 +4,9 @@
 #include "cpu_n2n.h"
 
 //  Time based defines
-#define TIME_STEP				3*TIME_DAY  //time step to be used for calculations
+#ifndef TIME_STEP
+	#define TIME_STEP			3*TIME_HOUR  //time step to be used for calculations
+#endif
 //  General use
 #define TIME_MIN 				60			// lowest granualarity is second
 #define TIME_HOUR				60*TIME_MIN
@@ -12,7 +14,10 @@
 #define TIME_MONTH				30*TIME_DAY
 #define TIME_YEAR				365*TIME_DAY
 
-#define EXIT_COUNT				200			//  number of iterations in loop
+#ifndef EXIT_COUNT
+	#define EXIT_COUNT			200			//  number of iterations in loop
+#endif
+
 #define FILENAME_LEN			256
 
 #define TIMING_ACTIVE			1 			//  comment me out to disable timing in compile
@@ -143,8 +148,8 @@ int main(int argc, char *argv[])
 
 		for(j = 0; j < num_bodies; j++)
 		{
-			for(k = j + 1; k < num_bodies; k++)
-				force_accum(mass, pos_x, pos_y, pos_z, fma_x, fma_y, fma_z, j, k);
+			for(k = 0; k < num_bodies; k++)
+				if(j != k) force_accum(mass, pos_x, pos_y, pos_z, fma_x, fma_y, fma_z, j, k);
 		}
 
 		position_update(mass, pos_x, pos_y, pos_z, vel_x, vel_y, vel_z, fma_x, fma_y, fma_z, num_bodies, TIME_STEP);

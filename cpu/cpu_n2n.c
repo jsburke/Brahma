@@ -55,12 +55,6 @@ void	force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data
 	fma_y[focus]  += F_part * r_y;
 	fma_z[focus]  += F_part * r_z;
 
-	// force for the comparison
-	// we know this by Newton's 3rd law
-
-	fma_x[comp]   += -fma_x[focus];
-	fma_y[comp]   += -fma_y[focus];
-	fma_z[comp]   += -fma_z[focus];
 }
 
 void	position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int len, int time)

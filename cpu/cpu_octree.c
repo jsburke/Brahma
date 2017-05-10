@@ -1,7 +1,15 @@
 #include "cpu_octree.h"
 
 const	data_t GRAV_CONST = 6.674e-11;
+data_t 		   HALF_TIME, TIME;
+
 #define LINE_LEN			512
+
+void	time_set_up(data_t timestep)
+{
+	HALF_TIME = 0.5 * timestep;
+	TIME 	  = timestep;
+}
 
 int		body_count(char* filename)
 {
@@ -95,28 +103,24 @@ int 	fileread_build_tree(char* filename, octant *root, int len)
 	return 1;
 }
 
-void	force_zero(octant* root)
+void	force_zero(octant* root, int i)
 {
-	int 		i, j, k, leaf_count;
+	int 		j, k, leaf_count;
 	octant*		local;
-	
-	#ifdef THREAD_ACTIVE
-		#pragma omp parallel for
-	#endif
 
-	for(i = 0; i < CHILD_COUNT; i++)
-		for(j = 0; j < CHILD_COUNT; j++)
+	for(j = 0; j < CHILD_COUNT; j++)
+	{
+		local 		= root->children[i]->children[j];
+		leaf_count 	= local->leaf_count;
+		for(k = 0; k < leaf_count; k++)
 		{
-			local 		= root->children[i]->children[j];
-			leaf_count 	= local->leaf_count;
-			for(k = 0; k < leaf_count; k++)
-			{
-				local->fma_x[k] = 0;
-				local->fma_y[k] = 0;
-				local->fma_z[k] = 0;
-			}
+			local->fma_x[k] = 0;
+			local->fma_y[k] = 0;
+			local->fma_z[k] = 0;
 		}
+	}
 }
+
 
 void 	body_body_force_accum(octant* oct, int focus, int comp)
 {
@@ -132,11 +136,6 @@ void 	body_body_force_accum(octant* oct, int focus, int comp)
 
 	F_part 	= FORCE_PARTIAL(GRAV_CONST, oct->mass[focus], oct->mass[comp], r);
 
-	// if(F_part > 0.0)
-	// 	printf("F_part legit: %.15lf\n", F_part);
-	// else
-	// 	printf("F_part super small\n");
-
 	F_x 	= F_part * r_x;
 	F_y 	= F_part * r_y;
 	F_z 	= F_part * r_z;
@@ -145,9 +144,9 @@ void 	body_body_force_accum(octant* oct, int focus, int comp)
 	oct->fma_y[focus] += F_y;
 	oct->fma_z[focus] += F_z;
 
-	oct->fma_x[comp] += -F_x;
-	oct->fma_y[comp] += -F_y;
-	oct->fma_z[comp] += -F_z;
+	oct->fma_x[comp] -= F_x;
+	oct->fma_y[comp] -= F_y;
+	oct->fma_z[comp] -= F_z;
 }
 
 void 	body_octant_force_accum(octant* local, int leaf, octant* distal)
@@ -171,98 +170,75 @@ void 	body_octant_force_accum(octant* local, int leaf, octant* distal)
 	local->fma_z[leaf] += F_part * r_z;
 }
 
-void	force_accum(octant* root)
+void	force_accum(octant* root, int i)
 {
-	int 	i, j, k, m, leaf_count;
+	int 	j, k, m, leaf_count;
 	octant 	*local;
 
-	#ifdef THREAD_ACTIVE
-		#pragma omp parallel for
-	#endif
-
-	for(i = 0; i < CHILD_COUNT; i++)
-		for(j = 0; j < CHILD_COUNT; j++)
+	for(j = 0; j < CHILD_COUNT; j++)
+	{
+		local 		= root->children[i]->children[j];
+		leaf_count  = local->leaf_count;
+		//  force interactions in suboctant
+		for(k = 0; k < leaf_count; k++)
 		{
-			local 		= root->children[i]->children[j];
-			leaf_count  = local->leaf_count;
-			//  force interactions in suboctant
-			for(k = 0; k < leaf_count; k++)
-			{
-				for(m = k + 1; m < leaf_count; m++)
+			for(m = k + 1; m < leaf_count; m++)
 					body_body_force_accum(local, k, m);
 
-				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);				
+			for(m = 0; m < CHILD_COUNT; m++)
+				if(m != j)body_octant_force_accum(local, k, root->children[i]->children[m]);
 
-				for(m = 0; m < CHILD_COUNT; m++)
-					if(m != j)body_octant_force_accum(local, k, root->children[i]->children[m]);
 
-				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);				
+			for(m = 0; m < CHILD_COUNT; m++)
+				if(m != i)body_octant_force_accum(local, k, root->children[m]);
 
-				for(m = 0; m < CHILD_COUNT; m++)
-					if(m != i)body_octant_force_accum(local, k, root->children[m]);
-
-				//printf("(%d, %d, %d) has force (%.5lf, %.5lf, %.5lf)\n", i, j, k, local->fma_x[k], local->fma_y[k], local->fma_z[k]);
-			}
 		}
+	}
 }
 
-void	position_update(octant* root, int timestep)
+void	position_update(octant* root, int i)
 {
-	int 		i, j, k, leaf_count;
+	int 		j, k, leaf_count;
 	octant* 	local;
 	data_t 		mass;
 
-	#ifdef THREAD_ACTIVE
-		#pragma omp parallel for
-	#endif
+	for(j = 0; j < CHILD_COUNT; j++)
+	{
+		octant* local = root->children[i]->children[j];
+		leaf_count    = local->leaf_count;
 
-	for(i = 0; i < CHILD_COUNT; i++)
-		for(j = 0; j < CHILD_COUNT; j++)
+		for(k = 0; k < leaf_count; k++)
 		{
-			octant* local = root->children[i]->children[j];
-			leaf_count    = local->leaf_count;
 
-			for(k = 0; k < leaf_count; k++)
-			{
+			mass 			  = local->mass[k];
+			local->fma_x[k]  /= mass;
+			local->fma_y[k]  /= mass;
+			local->fma_z[k]  /= mass;
 
-				//printf("(%d, %d, %d) has %.5lf kg is at (%.3lf, %.3lf, %.3lf)\n", i, j, k, local->mass[k], local->fma_x[k], local->fma_y[k], local->fma_z[k]);
+			
+			local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], TIME, HALF_TIME);
+			local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], TIME, HALF_TIME);
+			local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], TIME, HALF_TIME);
 
-				mass 			  = local->mass[k];
-				local->fma_x[k]  /= mass;
-				local->fma_y[k]  /= mass;
-				local->fma_z[k]  /= mass;
-
-				//printf("(%d, %d, %d) has %.5lf kg is at (%.3lf, %.3lf, %.3lf)\n", i, j, k, local->mass[k], local->fma_x[k], local->fma_y[k], local->fma_z[k]);
-
-				local->pos_x[k]	 += DISPLACE(local->vel_x[k], local->fma_x[k], timestep);
-				local->pos_y[k]	 += DISPLACE(local->vel_y[k], local->fma_y[k], timestep);
-				local->pos_z[k]	 += DISPLACE(local->vel_z[k], local->fma_z[k], timestep);
-
-				//printf("(%d, %d, %d) is at (%.3lf, %.3lf, %.3lf)\n", i, j, k, local->pos_x[k], local->pos_y[k], local->pos_z[k]);
-			}
 		}
+	}
 }
 
-void	velocity_update(octant* root, int timestep)
+void	velocity_update(octant* root, int i)
 {
-	int 		i, j, k, leaf_count;
+	int 		j, k, leaf_count;
 	octant* 	local;
-
-	#ifdef THREAD_ACTIVE
-		#pragma omp parallel for
-	#endif
 	
-	for(i = 0; i < CHILD_COUNT; i++)
-		for(j = 0; j < CHILD_COUNT; j++)
-		{
-			octant* local = root->children[i]->children[j];
-			leaf_count    = local->leaf_count;
+	for(j = 0; j < CHILD_COUNT; j++)
+	{
+		octant* local = root->children[i]->children[j];
+		leaf_count    = local->leaf_count;
 
 			for(k = 0; k < leaf_count; k++)
 			{
-				local->vel_x[k]	 += local->fma_x[k] * timestep;
-				local->vel_y[k]	 += local->fma_y[k] * timestep;
-				local->vel_z[k]	 += local->fma_z[k] * timestep;
+				local->vel_x[k]	 += local->fma_x[k] * TIME;
+				local->vel_y[k]	 += local->fma_y[k] * TIME;
+				local->vel_z[k]	 += local->fma_z[k] * TIME;
 			}
-		}
+	}
 }
