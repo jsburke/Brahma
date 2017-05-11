@@ -21,7 +21,7 @@ end
 
 % set up plot
 figure;
-colors  = ['b','r','m','k','g'];   % colors for plots
+colors  = ['k','r','m','b','g'];   % colors for plots
 
 for i = 1:opts
     plot(x, res(i,:), 'Color', colors(i));
