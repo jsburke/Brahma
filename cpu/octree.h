@@ -17,7 +17,7 @@ typedef double data_t;
 #define LEVEL_1				1
 #define LEVEL_2				2
 
-#define AREA_CAPACITY		10000
+#define AREA_CAPACITY		50000
 
 //  below sets the range that he objects can exist in
 //  restricted based on what data_t 
