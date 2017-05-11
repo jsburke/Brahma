@@ -24,6 +24,8 @@ OCT_OBJS = cpu_octree.o octree.o timing.o
 OCT_OMP = OCTREE_OMP
 OCT_OMP_OBJS = cpu_octree_omp.o octree.o timing.o
 
+EXE = $(N2N) $(OCT) $(OCT_OMP)
+
 TIME_STEP          = -DTIME_STEP=$(TIME)
 EXIT_COUNT         = -DEXIT_COUNT=$(ITERS)
 
@@ -92,4 +94,4 @@ timing.o: timing.c
 rebuild: clean all
 
 clean:
-	rm *.o $(N2N) $(OCT) $(OCT_VEC) $(OCT_OMP)
+	rm *.o $(EXE)

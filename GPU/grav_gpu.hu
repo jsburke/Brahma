@@ -1,0 +1,11 @@
+#ifndef GRAV_GPU_H
+#define GRAV_GPU_H
+
+typedef double data_t;
+
+__global__ void kernel_force_accum(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time);
+__global__ void kernel_force_zero(data_t* x, data_t* y, data_t* z, int len);
+__global__ void kernel_position_update(data_t* mass, data_t* pos_x, data_t* pos_y, data_t* pos_z, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time);
+__global__ void kernel_velocity_update(data_t* mass, data_t* vel_x, data_t* vel_y, data_t* vel_z, data_t* fma_x, data_t* fma_y, data_t* fma_z, int num_bodies, int time);
+
+#endif

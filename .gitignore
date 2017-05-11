@@ -58,3 +58,5 @@ build*/
 *.aux
 *.gz
 *.log
+
+*.DS_*
