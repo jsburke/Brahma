@@ -6,7 +6,8 @@
 
 system("clear");
 
-$myname = "sim_run";
+$myname = "method_compare";
+$final  = "method_compare.csv";
 
 $cwd = `pwd`; chomp $cwd;
 if (!($cwd =~ m|/cpu$|)) {
@@ -29,7 +30,7 @@ if (-e $octomp) {
 }
 
 $bodyGen = "../util/bodyGen.py";
-@objectCounts = (100, 500, 1000, 2000, 4000, 10000, 25000);
+@objectCounts = (100, 500, 1000, 2000, 4000, 6000, 10000, 15000, 25000);
 
 print "building $n2n, $oct, and $octomp\n";
 system("make");
@@ -100,6 +101,7 @@ foreach $count(@objectCounts)
 
 print "clean up\n";
 system("make clean");
+system("mv $file $final");
 system("rm galaxy_*.csv");
 
 print "$myname complete\n";
