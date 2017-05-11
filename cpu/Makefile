@@ -1,8 +1,10 @@
 DEFAULT_TIME_STEP  = off
 DEFAULT_EXIT_COUNT = off
+DEFAULT_THREADS    = on
 
 ITERS			   = 100
 TIME 			   = 5*TIME_HOUR
+THREADS            = 4
 
 TEST_PRINT    	   = off
 TIMING_ACTIVE 	   = on
@@ -28,6 +30,7 @@ EXE = $(N2N) $(OCT) $(OCT_OMP)
 
 TIME_STEP          = -DTIME_STEP=$(TIME)
 EXIT_COUNT         = -DEXIT_COUNT=$(ITERS)
+
 
 THREAD_DEFINES = -DTHREAD_ACTIVE
 
@@ -59,6 +62,10 @@ endif
 ifeq ($(DEFAULT_EXIT_COUNT), off)
 	THREAD_DEFINES += $(EXIT_COUNT)
 	SERIAL_DEFINES += $(EXIT_COUNT)
+endif
+
+ifeq ($(DEFAULT_THREADS), off)
+	THREAD_DEFINES += -DNUM_THREADS=$(THREADS)
 endif
 
 ifeq ($(VALGRIND_ACTIVE), on)
