@@ -17,7 +17,9 @@
 
 #ifdef THREAD_ACTIVE
 	#include <omp.h>
-	#define NUM_THREADS		4
+	#ifndef NUM_THREADS
+		#define NUM_THREADS		4
+	#endif
 #endif
 
 //  Functions & Macros for the math that will be needed
