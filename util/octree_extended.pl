@@ -38,7 +38,7 @@ foreach $rule(@make_rules)
 print "\nCreate CSV files for exectuion and capturing results\n";
 
 $bodyGen = "../util/bodyGen.py";
-@objectCounts = (100, 500, 1000, 2000, 4000, 6000, 10000, 15000, 25000, );
+@objectCounts = (100, 500, 1000, 2000, 4000, 6000, 10000, 15000, 25000, 50000, 100000);
 
 $file = "results.csv";
 if(-e $file){
