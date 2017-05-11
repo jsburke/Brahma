@@ -8,7 +8,7 @@ THREADS            = 4
 
 TEST_PRINT    	   = off
 TIMING_ACTIVE 	   = on
-CPE_ACTIVE    	   = off
+CPE_ACTIVE    	   = on
 CSV_ACTIVE	  	   = on
 VALGRIND_ACTIVE    = off
 
