@@ -219,7 +219,7 @@ int main(int argc, char *argv[]){
 	CUDA_SAFE_CALL(cudaPeekAtLastError());
 
 	CUDA_SAFE_CALL(cudaMemcpy(h_result, d_pos_x, allocSize, cudaMemcpyDeviceToHost));
-	printf("hi hi\n");
+	//printf("hi hi\n");
 
 	//printf("kernel call done\n");
 	cudaEventRecord(stop1,0);
